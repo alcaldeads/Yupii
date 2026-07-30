@@ -1,0 +1,162 @@
+"use client";
+
+import { useState } from "react";
+import { FILAS, PRODUCTOS, type Categoria, type Producto } from "@/data/productos";
+import BarraAnuncios from "@/components/BarraAnuncios";
+import Header from "@/components/Header";
+import HeroCarrusel from "@/components/HeroCarrusel";
+import FilaProductos from "@/components/FilaProductos";
+import { BandaCorporativa, Categorias, Newsletter, PieSitio } from "@/components/Secciones";
+import ModalProducto from "@/components/ModalProducto";
+import ModalCanje from "@/components/ModalCanje";
+import ModalMensaje, { type Mensaje } from "@/components/ModalMensaje";
+import { Chat } from "@/components/Icons";
+
+export default function Home() {
+  const [producto, setProducto] = useState<Producto | null>(null);
+  const [canje, setCanje] = useState(false);
+  const [mensaje, setMensaje] = useState<Mensaje>(null);
+  const [carrito, setCarrito] = useState(0);
+
+  const buscar = (q: string) => {
+    const t = q.toLowerCase().trim();
+    const hit = PRODUCTOS.find((p) =>
+      `${p.titulo} ${p.categoria} ${p.lugar} ${p.descripcion}`.toLowerCase().includes(t)
+    );
+    if (hit) setProducto(hit);
+    else
+      setMensaje({
+        icono: "🔍",
+        titulo: "Sin resultados",
+        texto: `No encontramos nada con "${q}". Prueba con spa, paracaídas, cena o Samaná.`,
+      });
+  };
+
+  const porCategoria = (c: Categoria) => {
+    const hit = PRODUCTOS.find((p) => p.categoria === c);
+    if (hit) setProducto(hit);
+  };
+
+  return (
+    <>
+      <div className="aviso-proto">
+        Prototipo de demostración — precios, aliados, fotos y calificaciones son de ejemplo. Nada se
+        cobra.
+      </div>
+
+      <BarraAnuncios />
+
+      <Header
+        carrito={carrito}
+        onAbrirRegalo={() => setCanje(true)}
+        onBuscar={buscar}
+        onCarrito={() =>
+          setMensaje({
+            icono: "🛒",
+            titulo: "Tu carrito",
+            texto: carrito
+              ? `Tienes ${carrito} experiencia${carrito > 1 ? "s" : ""} en el carrito.`
+              : "Tu carrito está vacío. Explora el catálogo y agrega la primera.",
+          })
+        }
+      />
+
+      <main>
+        <HeroCarrusel />
+
+        <div className="como-funciona">
+          <button
+            onClick={() =>
+              setMensaje({
+                icono: "🎁",
+                titulo: "Cómo funciona Yupii",
+                texto:
+                  "1. Eliges la experiencia y pagas. 2. Le llega el código por correo o WhatsApp con tu mensaje. 3. Reserva con el aliado y disfruta. Tiene 12 meses para canjearlo, y si no le sirve lo cambia por otra del mismo valor.",
+              })
+            }
+          >
+            ¿Cómo funciona Yupii?
+          </button>
+        </div>
+
+        <div className="wrap">
+          {FILAS.map((f) => (
+            <FilaProductos
+              key={f.id}
+              id={f.id}
+              titulo={f.titulo}
+              productos={PRODUCTOS.filter(f.filtro)}
+              onAbrir={setProducto}
+              onVerMas={() =>
+                setMensaje({
+                  icono: "📂",
+                  titulo: "Categoría completa",
+                  texto:
+                    "En el sitio real esto abre la categoría con todos sus filtros: precio, zona, cantidad de personas y calificación.",
+                })
+              }
+            />
+          ))}
+        </div>
+
+        <Categorias onElegir={porCategoria} />
+
+        <BandaCorporativa
+          onSolicitar={() =>
+            setMensaje({
+              icono: "💼",
+              titulo: "Propuesta corporativa",
+              texto:
+                "Un asesor te escribe en menos de 24 horas hábiles con la propuesta, la factura de muestra y el acceso al panel de seguimiento de canjes.",
+            })
+          }
+        />
+
+        <Newsletter
+          onSuscribir={() =>
+            setMensaje({
+              icono: "📬",
+              titulo: "Suscripción confirmada",
+              texto:
+                "Te vamos a avisar de las nuevas experiencias y de las ofertas antes que a nadie.",
+            })
+          }
+        />
+      </main>
+
+      <PieSitio />
+
+      <button
+        className="chat"
+        aria-label="Abrir chat"
+        onClick={() =>
+          setMensaje({
+            icono: "💬",
+            titulo: "Chat de soporte",
+            texto:
+              "Escríbenos por WhatsApp al 809 000 0000. Respondemos de lunes a sábado, de 8:00 a 20:00.",
+          })
+        }
+      >
+        <Chat />
+      </button>
+
+      <ModalProducto
+        producto={producto}
+        onCerrar={() => setProducto(null)}
+        onAgregarCarrito={(p) => {
+          setCarrito((c) => c + 1);
+          setProducto(null);
+          setMensaje({
+            icono: "🛒",
+            titulo: "Agregado al carrito",
+            texto: `${p.titulo} está en tu carrito. Puedes seguir viendo o finalizar la compra.`,
+          });
+        }}
+      />
+
+      <ModalCanje abierto={canje} onCerrar={() => setCanje(false)} />
+      <ModalMensaje mensaje={mensaje} onCerrar={() => setMensaje(null)} />
+    </>
+  );
+}
