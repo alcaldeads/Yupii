@@ -3,8 +3,8 @@
 import { useRef } from "react";
 import type { CatSection } from "@/data/productos";
 import type { Producto } from "@/data/productos";
-import { degradado, rd } from "@/lib/format";
-import { Chevron, Corazon, Estrella, Pin, Personas } from "./Icons";
+import { rd } from "@/lib/format";
+import { Chevron, Estrella, Pin, Personas } from "./Icons";
 
 type Props = {
   section: CatSection;
@@ -22,7 +22,7 @@ export default function CategorySection({ section, productos, onAbrir }: Props) 
 
   return (
     <section className="cat-section" id={section.id}>
-      {/* Video background — hidden on mobile via CSS */}
+      {/* Video background -- hidden on mobile via CSS */}
       <video
         className="cat-section-video"
         autoPlay
@@ -57,17 +57,21 @@ export default function CategorySection({ section, productos, onAbrir }: Props) 
 
             <div className="cat-section-riel" ref={riel}>
               {productos.map((p) => (
-                <button
+                <a
                   key={p.id}
                   className="glass-card"
-                  onClick={() => onAbrir(p)}
+                  href={`/experiencia/${p.slug}`}
                 >
                   <div className="glass-card-foto">
                     <div
                       className="glass-card-fondo"
-                      style={{ background: degradado(p.colores) }}
+                      style={{
+                        backgroundImage: `url(${p.imagen})`,
+                        backgroundSize: "cover",
+                        backgroundPosition: "center",
+                      }}
                     />
-                    <span className="glass-card-glifo">{p.glifo}</span>
+                    <div className="glass-card-foto-overlay" />
                     {p.etiqueta && (
                       <span
                         className={`glass-card-etiqueta${
@@ -110,7 +114,7 @@ export default function CategorySection({ section, productos, onAbrir }: Props) 
                       )}
                     </div>
                   </div>
-                </button>
+                </a>
               ))}
             </div>
 

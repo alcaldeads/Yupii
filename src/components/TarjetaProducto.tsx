@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import type { Producto } from "@/data/productos";
-import { degradado, rd } from "@/lib/format";
+import { rd } from "@/lib/format";
 import { Corazon, Estrella, Personas, Pin, Reloj } from "./Icons";
 
 export default function TarjetaProducto({
@@ -16,10 +16,17 @@ export default function TarjetaProducto({
   const verde = p.etiqueta === "Reserva online" || p.etiqueta === "Reserva ahora";
 
   return (
-    <button className="card" onClick={() => onAbrir(p)}>
+    <a href={`/experiencia/${p.slug}`} className="card" onClick={(e) => { e.preventDefault(); onAbrir(p); }}>
       <div className="card-foto">
-        <div className="fondo" style={{ background: degradado(p.colores) }} />
-        <span className="glifo">{p.glifo}</span>
+        <div
+          className="fondo"
+          style={{
+            backgroundImage: `url(${p.imagen})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        />
+        <div className="card-foto-overlay" />
 
         {p.etiqueta && (
           <span className={`etiqueta${verde ? " verde" : ""}`}>
@@ -35,6 +42,7 @@ export default function TarjetaProducto({
           aria-label="Guardar"
           onClick={(e) => {
             e.stopPropagation();
+            e.preventDefault();
             setFav((v) => !v);
           }}
           onKeyDown={(e) => {
@@ -74,6 +82,6 @@ export default function TarjetaProducto({
         {rd(p.precio)}
         {p.precioAntes > 0 && <span className="antes">{rd(p.precioAntes)}</span>}
       </div>
-    </button>
+    </a>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { FILAS, PRODUCTOS, SECCIONES_CAT, type Categoria, type Producto } from "@/data/productos";
+import { FILAS, PRODUCTOS, SECCIONES_CAT, type Producto } from "@/data/productos";
 import Header from "@/components/Header";
 import HeroCarrusel from "@/components/HeroCarrusel";
 import FilaProductos from "@/components/FilaProductos";
@@ -9,13 +9,11 @@ import CategorySection from "@/components/CategorySection";
 import { BandaCorporativa, Newsletter, PieSitio } from "@/components/Secciones";
 import Opiniones from "@/components/Opiniones";
 import FAQ from "@/components/FAQ";
-import ModalProducto from "@/components/ModalProducto";
 import ModalCanje from "@/components/ModalCanje";
 import ModalMensaje, { type Mensaje } from "@/components/ModalMensaje";
 import { Chat } from "@/components/Icons";
 
 export default function Home() {
-  const [producto, setProducto] = useState<Producto | null>(null);
   const [canje, setCanje] = useState(false);
   const [mensaje, setMensaje] = useState<Mensaje>(null);
   const [carrito, setCarrito] = useState(0);
@@ -25,13 +23,19 @@ export default function Home() {
     const hit = PRODUCTOS.find((p) =>
       `${p.titulo} ${p.categoria} ${p.lugar} ${p.descripcion}`.toLowerCase().includes(t)
     );
-    if (hit) setProducto(hit);
-    else
+    if (hit) {
+      window.location.href = `/experiencia/${hit.slug}`;
+    } else {
       setMensaje({
         icono: "🔍",
         titulo: "Sin resultados",
         texto: `No encontramos nada con "${q}". Prueba con spa, paracaídas, cena o Samaná.`,
       });
+    }
+  };
+
+  const abrirExperiencia = (p: Producto) => {
+    window.location.href = `/experiencia/${p.slug}`;
   };
 
   return (
@@ -62,7 +66,7 @@ export default function Home() {
               id={f.id}
               titulo={f.titulo}
               productos={PRODUCTOS.filter(f.filtro)}
-              onAbrir={setProducto}
+              onAbrir={abrirExperiencia}
               onVerMas={() =>
                 setMensaje({
                   icono: "📂",
@@ -81,7 +85,7 @@ export default function Home() {
             key={sec.id}
             section={sec}
             productos={PRODUCTOS.filter((p) => p.categoria === sec.categoria)}
-            onAbrir={setProducto}
+            onAbrir={abrirExperiencia}
           />
         ))}
 
@@ -128,20 +132,6 @@ export default function Home() {
       >
         <Chat />
       </button>
-
-      <ModalProducto
-        producto={producto}
-        onCerrar={() => setProducto(null)}
-        onAgregarCarrito={(p) => {
-          setCarrito((c) => c + 1);
-          setProducto(null);
-          setMensaje({
-            icono: "🛒",
-            titulo: "Agregado al carrito",
-            texto: `${p.titulo} está en tu carrito. Puedes seguir viendo o finalizar la compra.`,
-          });
-        }}
-      />
 
       <ModalCanje abierto={canje} onCerrar={() => setCanje(false)} />
       <ModalMensaje mensaje={mensaje} onCerrar={() => setMensaje(null)} />
