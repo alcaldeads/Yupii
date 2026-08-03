@@ -7,6 +7,8 @@ import Header from "@/components/Header";
 import HeroCarrusel from "@/components/HeroCarrusel";
 import FilaProductos from "@/components/FilaProductos";
 import { BandaCorporativa, Categorias, Newsletter, PieSitio } from "@/components/Secciones";
+import Opiniones from "@/components/Opiniones";
+import FAQ from "@/components/FAQ";
 import ModalProducto from "@/components/ModalProducto";
 import ModalCanje from "@/components/ModalCanje";
 import ModalMensaje, { type Mensaje } from "@/components/ModalMensaje";
@@ -39,11 +41,6 @@ export default function Home() {
 
   return (
     <>
-      <div className="aviso-proto">
-        Prototipo de demostración — precios, aliados, fotos y calificaciones son de ejemplo. Nada se
-        cobra.
-      </div>
-
       <BarraAnuncios />
 
       <Header
@@ -63,21 +60,6 @@ export default function Home() {
 
       <main>
         <HeroCarrusel />
-
-        <div className="como-funciona">
-          <button
-            onClick={() =>
-              setMensaje({
-                icono: "🎁",
-                titulo: "Cómo funciona Yupii",
-                texto:
-                  "1. Eliges la experiencia y pagas. 2. Le llega el código por correo o WhatsApp con tu mensaje. 3. Reserva con el aliado y disfruta. Tiene 12 meses para canjearlo, y si no le sirve lo cambia por otra del mismo valor.",
-              })
-            }
-          >
-            ¿Cómo funciona Yupii?
-          </button>
-        </div>
 
         <div className="wrap">
           {FILAS.map((f) => (
@@ -101,6 +83,8 @@ export default function Home() {
 
         <Categorias onElegir={porCategoria} />
 
+        <Opiniones />
+
         <BandaCorporativa
           onSolicitar={() =>
             setMensaje({
@@ -122,6 +106,8 @@ export default function Home() {
             })
           }
         />
+
+        <FAQ />
       </main>
 
       <PieSitio />
