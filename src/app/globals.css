@@ -450,6 +450,13 @@ video.cat-section-video-bg {
 .cat-section-yt-wrap.visible {
   opacity: 1;
 }
+/* Blocker div on top of iframe — prevents YouTube hover controls */
+.cat-section-yt-wrap::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
 .cat-section-yt-wrap iframe {
   position: absolute;
   top: 50%;
