@@ -1,101 +1,11 @@
 "use client";
 
-import { useRef, useEffect, useState, useCallback } from "react";
+import { useRef } from "react";
 import type { CatSection } from "@/data/productos";
 import type { Producto } from "@/data/productos";
 import { rd } from "@/lib/format";
 import { Chevron, Estrella, Pin, Personas } from "./Icons";
 
-/* ------------------------------------------------------------------ */
-/*  YouTube Background — uses IFrame Player API for full control       */
-/* ------------------------------------------------------------------ */
-function YouTubeBackground({
-  videoId,
-  start = 0,
-}: {
-  videoId: string;
-  start?: number;
-}) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [ready, setReady] = useState(false);
-
-  const initPlayer = useCallback(() => {
-    if (!containerRef.current) return;
-
-    // Create a div for the player inside the container
-    const playerDiv = document.createElement("div");
-    playerDiv.id = `yt-bg-${videoId}-${Date.now()}`;
-    containerRef.current.appendChild(playerDiv);
-
-    const YT = (window as unknown as Record<string, unknown>).YT as {
-      Player: new (
-        el: string,
-        opts: Record<string, unknown>
-      ) => Record<string, unknown>;
-    };
-
-    new YT.Player(playerDiv.id, {
-      videoId,
-      playerVars: {
-        autoplay: 1,
-        mute: 1,
-        controls: 0,
-        showinfo: 0,
-        rel: 0,
-        iv_load_policy: 3,
-        modestbranding: 1,
-        playsinline: 1,
-        disablekb: 1,
-        fs: 0,
-        start,
-        loop: 1,
-        playlist: videoId,
-      },
-      events: {
-        onReady: (e: { target: { playVideo: () => void } }) => {
-          e.target.playVideo();
-          // Fade in after a short delay to avoid black flash
-          setTimeout(() => setReady(true), 600);
-        },
-      },
-    });
-  }, [videoId, start]);
-
-  useEffect(() => {
-    // Load YouTube IFrame API if not already loaded
-    const w = window as unknown as Record<string, unknown>;
-    if (w.YT && (w.YT as Record<string, unknown>).Player) {
-      initPlayer();
-      return;
-    }
-
-    // Check if script is already being loaded
-    if (!document.querySelector('script[src*="youtube.com/iframe_api"]')) {
-      const tag = document.createElement("script");
-      tag.src = "https://www.youtube.com/iframe_api";
-      document.head.appendChild(tag);
-    }
-
-    // Wait for API to be ready
-    const prev = w.onYouTubeIframeAPIReady as (() => void) | undefined;
-    w.onYouTubeIframeAPIReady = () => {
-      if (prev) prev();
-      initPlayer();
-    };
-  }, [initPlayer]);
-
-  return (
-    <div
-      ref={containerRef}
-      className={`cat-section-youtube${ready ? " loaded" : ""}`}
-      aria-hidden="true"
-    />
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/*  Main component                                                     */
-/* ------------------------------------------------------------------ */
 type Props = {
   section: CatSection;
   productos: Producto[];
@@ -112,35 +22,38 @@ export default function CategorySection({ section, productos, onAbrir }: Props) 
 
   return (
     <section className="cat-section" id={section.id}>
-      {/* YouTube background (if available) -- hidden on mobile via CSS */}
-      {section.youtubeId && (
-        <YouTubeBackground
-          videoId={section.youtubeId}
-          start={section.youtubeStart}
+      {/* Video de fondo — YouTube o MP4 */}
+      {section.youtubeId ? (
+        <iframe
+          className="cat-section-video-bg"
+          src={`https://www.youtube.com/embed/${section.youtubeId}?autoplay=1&mute=1&start=${section.youtubeStart || 0}&loop=1&playlist=${section.youtubeId}&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1&iv_load_policy=3&disablekb=1`}
+          allow="autoplay; encrypted-media"
+          allowFullScreen={false}
+          tabIndex={-1}
+          title=""
+          aria-hidden="true"
         />
-      )}
-
-      {/* MP4 video fallback (if no YouTube) */}
-      {!section.youtubeId && section.videoUrl && (
+      ) : section.videoUrl ? (
         <video
-          className="cat-section-video"
+          className="cat-section-video-bg"
           autoPlay
           muted
           loop
           playsInline
+          preload="auto"
           aria-hidden="true"
         >
           <source src={section.videoUrl} type="video/mp4" />
         </video>
-      )}
+      ) : null}
 
-      {/* Gradient fallback (always visible, video overlays on desktop) */}
+      {/* Gradient fallback (behind video) */}
       <div className="cat-section-gradient" style={{ background: section.gradiente }} />
 
-      {/* Dark overlay for readability */}
+      {/* Overlay oscuro */}
       <div className="cat-section-overlay" />
 
-      {/* Content on top */}
+      {/* Contenido encima */}
       <div className="cat-section-content">
         <div className="wrap">
           <h2 className="cat-section-title">{section.titulo}</h2>
