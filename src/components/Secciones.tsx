@@ -1,25 +1,6 @@
 "use client";
 
-import { CATEGORIAS, type Categoria } from "@/data/productos";
-import { Flecha, Logo } from "./Icons";
-
-export function Categorias({ onElegir }: { onElegir: (c: Categoria) => void }) {
-  return (
-    <div className="wrap" id="categorias">
-      <div className="fila-cab">
-        <h2>Ideas de regalos</h2>
-      </div>
-      <div className="cats">
-        {CATEGORIAS.map((c) => (
-          <button key={c.cat} className="cat-b" onClick={() => onElegir(c.cat)}>
-            <div className="ic">{c.icono}</div>
-            <div className="n">{c.nombre}</div>
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-}
+import { Flecha } from "./Icons";
 
 export function BandaCorporativa({ onSolicitar }: { onSolicitar: () => void }) {
   return (

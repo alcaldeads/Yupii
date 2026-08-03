@@ -11,19 +11,25 @@ type Props = {
   onAgregarCarrito: (p: Producto) => void;
 };
 
+type Flujo = "info" | "regalo-form" | "regalo-ok" | "parami-form" | "parami-ok";
+
 export default function ModalProducto({ producto, onCerrar, onAgregarCarrito }: Props) {
-  const [paso, setPaso] = useState(0);
+  const [flujo, setFlujo] = useState<Flujo>("info");
   const [nombre, setNombre] = useState("");
   const [contacto, setContacto] = useState("");
   const [mensaje, setMensaje] = useState("");
+  const [miNombre, setMiNombre] = useState("");
+  const [miEmail, setMiEmail] = useState("");
   const [codigo, setCodigo] = useState("");
 
   useEffect(() => {
     if (producto) {
-      setPaso(0);
+      setFlujo("info");
       setNombre("");
       setContacto("");
       setMensaje("");
+      setMiNombre("");
+      setMiEmail("");
     }
   }, [producto]);
 
@@ -32,26 +38,35 @@ export default function ModalProducto({ producto, onCerrar, onAgregarCarrito }: 
 
   return (
     <Modal abierto onCerrar={onCerrar}>
-      <div className="modal-foto" style={{ background: degradado(p.colores) }}>
-        <span className="glifo">{p.glifo}</span>
-      </div>
+      {/* ACT 1 — Feel it: storytelling hero */}
+      {flujo === "info" && (
+        <div
+          className="modal-historia"
+          style={{ background: degradado(p.colores) }}
+        >
+          <div className="modal-historia-overlay" />
+          <div className="modal-historia-content">
+            <span className="modal-historia-glifo">{p.glifo}</span>
+            <p className="modal-historia-texto">{p.historia}</p>
+          </div>
+        </div>
+      )}
+
+      {/* Fallback header for other flows */}
+      {flujo !== "info" && (
+        <div className="modal-foto" style={{ background: degradado(p.colores) }}>
+          <span className="glifo">{p.glifo}</span>
+        </div>
+      )}
 
       <div className="modal-body">
-        {paso === 0 && (
+        {/* ACT 2 — Discover it */}
+        {flujo === "info" && (
           <>
             <span className="chip-cat">{p.categoria}</span>
             <h2>{p.titulo}</h2>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 14,
-                fontSize: ".9rem",
-                color: "var(--gris-txt)",
-                marginTop: 6,
-                flexWrap: "wrap",
-              }}
-            >
+
+            <div className="modal-info-row">
               <span>📍 {p.lugar}</span>
               <span>
                 👤 Para {p.personas} persona{p.personas > 1 ? "s" : ""}
@@ -59,46 +74,46 @@ export default function ModalProducto({ producto, onCerrar, onAgregarCarrito }: 
               <span>★ {p.rating.toFixed(1)}</span>
             </div>
 
-            <p style={{ marginTop: 14, color: "var(--gris-txt)", fontSize: ".94rem" }}>
-              {p.descripcion}
-            </p>
+            <p className="modal-desc">{p.descripcion}</p>
 
             <ul className="incluye">
-              {p.incluye.map((i) => (
-                <li key={i}>
+              {p.incluye.map((item) => (
+                <li key={item}>
                   <b>✓</b>
-                  {i}
+                  {item}
                 </li>
               ))}
             </ul>
 
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                gap: 16,
-                marginTop: 22,
-                flexWrap: "wrap",
-              }}
-            >
-              <div style={{ fontSize: "1.6rem", fontWeight: 800 }}>
+            {/* ACT 3 — Act on it: pricing + two CTAs */}
+            <div className="modal-precio-row">
+              <div className="modal-precio-amount">
                 {rd(p.precio)}
-                {p.precioAntes > 0 && <span className="antes">{rd(p.precioAntes)}</span>}
+                {p.precioAntes > 0 && (
+                  <span className="antes">{rd(p.precioAntes)}</span>
+                )}
               </div>
-              <div style={{ display: "flex", gap: 10 }}>
-                <button className="btn-gris" onClick={() => onAgregarCarrito(p)}>
-                  Agregar al carrito
-                </button>
-                <button className="btn-lleno" onClick={() => setPaso(1)}>
-                  Regalar ahora
-                </button>
-              </div>
+            </div>
+
+            <div className="modal-ctas">
+              <button
+                className="btn-lleno modal-cta-regalo"
+                onClick={() => setFlujo("regalo-form")}
+              >
+                🎁 Regalar esta experiencia
+              </button>
+              <button
+                className="btn-parami"
+                onClick={() => setFlujo("parami-form")}
+              >
+                💜 La quiero para mí
+              </button>
             </div>
           </>
         )}
 
-        {paso === 1 && (
+        {/* Gift flow — step 1: recipient form */}
+        {flujo === "regalo-form" && (
           <>
             <h2>¿A quién se lo enviamos?</h2>
 
@@ -145,14 +160,14 @@ export default function ModalProducto({ producto, onCerrar, onAgregarCarrito }: 
             </div>
 
             <div className="modal-pie">
-              <button className="btn-gris" onClick={() => setPaso(0)}>
+              <button className="btn-gris" onClick={() => setFlujo("info")}>
                 Atrás
               </button>
               <button
                 className="btn-lleno"
                 onClick={() => {
                   setCodigo(generarCodigo());
-                  setPaso(2);
+                  setFlujo("regalo-ok");
                 }}
               >
                 Confirmar regalo
@@ -161,20 +176,114 @@ export default function ModalProducto({ producto, onCerrar, onAgregarCarrito }: 
           </>
         )}
 
-        {paso === 2 && (
+        {/* Gift flow — step 2: success */}
+        {flujo === "regalo-ok" && (
           <div className="exito">
             <div className="ic">🎉</div>
             <h2 style={{ fontSize: "1.4rem" }}>Listo, ya va en camino</h2>
             <p style={{ color: "var(--gris-txt)", marginTop: 8, fontSize: ".94rem" }}>
-              {nombre.trim() || "Tu persona"} va a recibir el regalo con tu mensaje y este código.
+              {nombre.trim() || "Tu persona"} va a recibir el regalo con tu mensaje y
+              este código.
             </p>
 
             <div className="codigo-caja">
               <div className="k">CÓDIGO DEL REGALO</div>
               <div className="v">{codigo}</div>
-              <div style={{ fontSize: ".83rem", color: "var(--gris-txt)", marginTop: 8 }}>
-                Válido por 12 meses. Si la experiencia no está disponible, se cambia por otra del
-                mismo valor o se devuelve el dinero.
+              <div
+                style={{
+                  fontSize: ".83rem",
+                  color: "var(--gris-txt)",
+                  marginTop: 8,
+                }}
+              >
+                Válido por 12 meses. Si la experiencia no está disponible, se cambia
+                por otra del mismo valor o se devuelve el dinero.
+              </div>
+            </div>
+
+            <div className="modal-pie" style={{ justifyContent: "center" }}>
+              <button className="btn-lleno" onClick={onCerrar}>
+                Entendido
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Buy for self — simplified form */}
+        {flujo === "parami-form" && (
+          <>
+            <h2>Comprar para mí</h2>
+            <p className="modal-desc">
+              Completa tus datos y recibirás el código de la experiencia en tu correo.
+            </p>
+
+            <div className="campo">
+              <label htmlFor="mN">Tu nombre</label>
+              <input
+                id="mN"
+                value={miNombre}
+                onChange={(e) => setMiNombre(e.target.value)}
+                placeholder="Tu nombre completo"
+                maxLength={40}
+              />
+            </div>
+
+            <div className="campo">
+              <label htmlFor="mE">Tu correo electrónico</label>
+              <input
+                id="mE"
+                type="email"
+                value={miEmail}
+                onChange={(e) => setMiEmail(e.target.value)}
+                placeholder="tu@correo.com"
+              />
+            </div>
+
+            <div className="modal-precio-row" style={{ marginTop: 16 }}>
+              <div className="modal-precio-amount">
+                Total: {rd(p.precio)}
+              </div>
+            </div>
+
+            <div className="modal-pie">
+              <button className="btn-gris" onClick={() => setFlujo("info")}>
+                Atrás
+              </button>
+              <button
+                className="btn-lleno"
+                onClick={() => {
+                  setCodigo(generarCodigo());
+                  setFlujo("parami-ok");
+                }}
+              >
+                Confirmar compra
+              </button>
+            </div>
+          </>
+        )}
+
+        {/* Buy for self — success */}
+        {flujo === "parami-ok" && (
+          <div className="exito">
+            <div className="ic">🎉</div>
+            <h2 style={{ fontSize: "1.4rem" }}>Tu experiencia está lista</h2>
+            <p style={{ color: "var(--gris-txt)", marginTop: 8, fontSize: ".94rem" }}>
+              {miNombre.trim() || "Hola"}, te enviamos el código a tu correo. Usa este
+              código para reservar con el aliado.
+            </p>
+
+            <div className="codigo-caja">
+              <div className="k">TU CÓDIGO</div>
+              <div className="v">{codigo}</div>
+              <div
+                style={{
+                  fontSize: ".83rem",
+                  color: "var(--gris-txt)",
+                  marginTop: 8,
+                }}
+              >
+                Válido por 12 meses. Si la experiencia no está disponible, se cambia
+                por otra del mismo valor o se devuelve el dinero.
               </div>
             </div>
 

@@ -5,25 +5,36 @@ import { Chevron } from "./Icons";
 
 const SLIDES = [
   {
-    fondo: "linear-gradient(105deg,#1B1B2E 0%,#3A2A6B 48%,#5B3DF5 100%)",
-    marca: "ciclos yupii",
-    titulo: "Mesa del chef en la Zona Colonial",
-    texto: "Ocho tiempos, maridaje y cocina abierta. Solo 12 asientos por noche.",
-    pill: "Cupos limitados",
+    fondo: "linear-gradient(135deg, #0a0a2e 0%, #1B1B4E 30%, #3A2A8B 65%, #5B3DF5 100%)",
+    marca: "experiencias yupii",
+    titulo: "Regala algo que se siente, no algo que se guarda",
+    texto: "Más de 50 experiencias únicas en República Dominicana. Desde paracaídas hasta cenas de chef.",
+    pill: "Explorar catálogo",
+    href: "#aventura",
   },
   {
-    fondo: "linear-gradient(105deg,#03363D 0%,#0B6E6B 45%,#17A398 100%)",
+    fondo: "linear-gradient(135deg, #01242e 0%, #03464D 30%, #0B7E7B 65%, #17C3B8 100%)",
     marca: "aventura",
     titulo: "Salta en paracaídas sobre Punta Cana",
-    texto: "Tándem desde 10,000 pies, con video incluido. Todos los días.",
-    pill: "Reserva online",
+    texto: "10,000 pies. Caída libre. Video incluido. La experiencia más regalada del país.",
+    pill: "Ver experiencia",
+    href: "#aventura",
   },
   {
-    fondo: "linear-gradient(105deg,#4A1F0B 0%,#8A3D12 45%,#E07A26 100%)",
+    fondo: "linear-gradient(135deg, #1a0a2e 0%, #3C1652 30%, #6b3a80 65%, #B07BAC 100%)",
+    marca: "bienestar",
+    titulo: "Un ritual de spa que no se olvida",
+    texto: "Masaje a cuatro manos, jacuzzi, espumante. El regalo perfecto para quien lo merece todo.",
+    pill: "Descubrir",
+    href: "#bienestar",
+  },
+  {
+    fondo: "linear-gradient(135deg, #2a1a0a 0%, #4A2F0B 30%, #8A5D22 65%, #E0A026 100%)",
     marca: "empresas",
-    titulo: "Regala a tu equipo sin regalar tazas",
-    texto: "Un monto, cientos de experiencias. Cada quien elige la suya.",
+    titulo: "Regala experiencias a tu equipo, no tazas",
+    texto: "Tú fijas el presupuesto. Cada quien elige su experiencia. Dashboard de seguimiento incluido.",
     pill: "Pedir propuesta",
+    href: "#corpo",
   },
 ];
 
@@ -37,7 +48,7 @@ export default function HeroCarrusel() {
   }, []);
 
   useEffect(() => {
-    const t = setInterval(() => setI((x) => (x + 1) % SLIDES.length), 6000);
+    const t = setInterval(() => setI((x) => (x + 1) % SLIDES.length), 7000);
     return () => clearInterval(t);
   }, [pausa]);
 
@@ -51,11 +62,13 @@ export default function HeroCarrusel() {
         <div className="hero-riel" style={{ transform: `translateX(-${i * 100}%)` }}>
           {SLIDES.map((s) => (
             <div className="slide" key={s.titulo} style={{ background: s.fondo }}>
-              <div>
+              <div className="slide-inner">
                 <div className="marca">{s.marca}</div>
                 <h2>{s.titulo}</h2>
                 <p>{s.texto}</p>
-                <span className="pill">{s.pill}</span>
+                <a className="pill" href={s.href}>
+                  {s.pill}
+                </a>
               </div>
             </div>
           ))}

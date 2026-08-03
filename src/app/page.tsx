@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { FILAS, PRODUCTOS, type Categoria, type Producto } from "@/data/productos";
-import BarraAnuncios from "@/components/BarraAnuncios";
+import { FILAS, PRODUCTOS, SECCIONES_CAT, type Categoria, type Producto } from "@/data/productos";
 import Header from "@/components/Header";
 import HeroCarrusel from "@/components/HeroCarrusel";
 import FilaProductos from "@/components/FilaProductos";
-import { BandaCorporativa, Categorias, Newsletter, PieSitio } from "@/components/Secciones";
+import CategorySection from "@/components/CategorySection";
+import { BandaCorporativa, Newsletter, PieSitio } from "@/components/Secciones";
 import Opiniones from "@/components/Opiniones";
 import FAQ from "@/components/FAQ";
 import ModalProducto from "@/components/ModalProducto";
@@ -34,15 +34,8 @@ export default function Home() {
       });
   };
 
-  const porCategoria = (c: Categoria) => {
-    const hit = PRODUCTOS.find((p) => p.categoria === c);
-    if (hit) setProducto(hit);
-  };
-
   return (
     <>
-      <BarraAnuncios />
-
       <Header
         carrito={carrito}
         onAbrirRegalo={() => setCanje(true)}
@@ -61,6 +54,7 @@ export default function Home() {
       <main>
         <HeroCarrusel />
 
+        {/* Highlighted rows: "Lo más regalado" and "Ofertas" */}
         <div className="wrap">
           {FILAS.map((f) => (
             <FilaProductos
@@ -81,7 +75,15 @@ export default function Home() {
           ))}
         </div>
 
-        <Categorias onElegir={porCategoria} />
+        {/* Category sections with video backgrounds */}
+        {SECCIONES_CAT.map((sec) => (
+          <CategorySection
+            key={sec.id}
+            section={sec}
+            productos={PRODUCTOS.filter((p) => p.categoria === sec.categoria)}
+            onAbrir={setProducto}
+          />
+        ))}
 
         <Opiniones />
 

@@ -4,8 +4,7 @@ export type Categoria =
   | "Aventura"
   | "Náutico"
   | "Estadías"
-  | "Cultura"
-  | "Eventos";
+  | "Cultura";
 
 export type Producto = {
   id: number;
@@ -22,64 +21,161 @@ export type Producto = {
   descripcion: string;
   incluye: string[];
   aliados: [string, string][];
+  historia: string;
+  videoCategoria: string;
 };
+
+const VIDEO_AVENTURA = "/videos/aventura.mp4";
+const VIDEO_NAUTICO = "/videos/nautico.mp4";
+const VIDEO_BIENESTAR = "/videos/bienestar.mp4";
+const VIDEO_GASTRONOMIA = "/videos/gastronomia.mp4";
+const VIDEO_ESTADIAS = "/videos/estadias.mp4";
+const VIDEO_CULTURA = "/videos/cultura.mp4";
 
 export const PRODUCTOS: Producto[] = [
   {
     id: 1,
-    titulo: "Cena degustación de 8 tiempos",
-    categoria: "Gastronomía",
-    lugar: "Zona Colonial",
-    personas: 2,
-    rating: 4.9,
-    precio: 8900,
-    precioAntes: 10500,
-    glifo: "🍽️",
-    colores: ["#6E2C00", "#D68910"],
-    etiqueta: "Reserva online",
-    descripcion:
-      "Menú del chef con maridaje en una casona restaurada del siglo XVII. Cocina abierta y solo doce asientos por noche.",
-    incluye: [
-      "Ocho tiempos para dos personas",
-      "Maridaje de vinos incluido",
-      "Mesa reservada a tu nombre",
-      "Válido de martes a sábado",
-    ],
-    aliados: [
-      ["Mesón de la Zona", "Martes a sábado · 19:00 y 21:00"],
-      ["Casa Bastidas", "Jueves a domingo · 20:00"],
-    ],
-  },
-  {
-    id: 2,
-    titulo: "Salto en paracaídas tándem",
+    titulo: "Salto tándem en paracaídas",
     categoria: "Aventura",
     lugar: "Punta Cana",
     personas: 1,
     rating: 5.0,
-    precio: 19500,
+    precio: 21500,
     precioAntes: 0,
     glifo: "🪂",
     colores: ["#0F3460", "#3E92CC"],
     etiqueta: "Reserva ahora",
     descripcion:
-      "Salto desde 10,000 pies con instructor certificado. Vista completa de la costa este antes de abrir el paracaídas.",
+      "Salto desde 10,000 pies con instructor USPA certificado. Vista completa de la costa este. Video y fotos incluidas.",
     incluye: [
-      "Instructor tándem certificado",
-      "Equipo completo y briefing",
-      "Video y fotos del salto",
-      "Traslado desde tu hotel",
+      "Instructor tándem USPA certificado",
+      "Equipo completo y briefing de seguridad",
+      "Video HD y fotos del salto",
+      "Traslado desde tu hotel en Punta Cana",
     ],
     aliados: [
       ["Skydive Punta Cana", "Vuelos 8:00 y 15:00 · todos los días"],
-      ["Bávaro Adventures", "Fines de semana"],
     ],
+    historia:
+      "Diez mil pies de altura. El viento en la cara. La costa de Punta Cana debajo de ti. Y entonces... saltas. Cuarenta segundos de caída libre que cambian cómo ves todo.",
+    videoCategoria: VIDEO_AVENTURA,
+  },
+  {
+    id: 2,
+    titulo: "Catamarán al atardecer",
+    categoria: "Náutico",
+    lugar: "Bávaro",
+    personas: 2,
+    rating: 4.7,
+    precio: 5900,
+    precioAntes: 7200,
+    glifo: "⛵",
+    colores: ["#0E6251", "#48C9B0"],
+    etiqueta: "Reserva online",
+    descripcion:
+      "Tres horas de navegación por la costa de Bávaro al atardecer. Barra abierta, snorkel y música a bordo.",
+    incluye: [
+      "Barra abierta nacional e internacional",
+      "Snorkel con equipo incluido",
+      "Música en vivo a bordo",
+      "Para dos personas",
+    ],
+    aliados: [
+      ["Bávaro Sailing", "Salidas 15:30 diarias"],
+      ["Power Adventures", "Miércoles a domingo"],
+    ],
+    historia:
+      "El sol cae sobre el Caribe mientras brindas con la persona que más quieres. Tres horas de sal, brisa y música suave. Esto no se olvida.",
+    videoCategoria: VIDEO_NAUTICO,
   },
   {
     id: 3,
+    titulo: "Curso de kitesurf 3 días",
+    categoria: "Aventura",
+    lugar: "Cabarete",
+    personas: 1,
+    rating: 4.8,
+    precio: 34500,
+    precioAntes: 0,
+    glifo: "🪁",
+    colores: ["#154360", "#5499C7"],
+    etiqueta: "",
+    descripcion:
+      "Tres días de clases en la capital mundial del kitesurf. Instructor IKO certificado, 9 horas totales, equipo incluido.",
+    incluye: [
+      "9 horas de clase en 3 días",
+      "Equipo completo incluido",
+      "Instructor IKO certificado",
+      "Máximo 3 alumnos por grupo",
+    ],
+    aliados: [
+      ["Cabarete Kite Point", "Todo el año según viento"],
+      ["KiteDR", "Octubre a agosto"],
+    ],
+    historia:
+      "Cabarete, la capital mundial del kitesurf. Tres días aprendiendo a volar sobre el agua con instructores IKO. No necesitas experiencia, solo ganas.",
+    videoCategoria: VIDEO_AVENTURA,
+  },
+  {
+    id: 4,
+    titulo: "Buceo en Isla Catalina",
+    categoria: "Náutico",
+    lugar: "Bayahíbe",
+    personas: 1,
+    rating: 4.8,
+    precio: 9200,
+    precioAntes: 0,
+    glifo: "🤿",
+    colores: ["#1A5276", "#7FB3D5"],
+    etiqueta: "Reserva online",
+    descripcion:
+      "Dos inmersiones en El Muro y El Acuario de Isla Catalina. Almuerzo en la isla incluido.",
+    incluye: [
+      "Dos inmersiones guiadas",
+      "Equipo completo de buceo",
+      "Almuerzo buffet en la isla",
+      "Traslado en bote desde Bayahíbe",
+    ],
+    aliados: [
+      ["ScubaFun", "Martes a domingo"],
+      ["Dressel Divers", "Todo el año"],
+    ],
+    historia:
+      "Desciendes por El Muro de Catalina y el mundo cambia. Corales, peces tropicales, tortugas. Dos inmersiones en uno de los mejores arrecifes del Caribe.",
+    videoCategoria: VIDEO_NAUTICO,
+  },
+  {
+    id: 5,
+    titulo: "Vuelo en globo aerostático",
+    categoria: "Aventura",
+    lugar: "Punta Cana",
+    personas: 2,
+    rating: 5.0,
+    precio: 11500,
+    precioAntes: 0,
+    glifo: "🎈",
+    colores: ["#123C69", "#AC3B61"],
+    etiqueta: "Exclusivo",
+    descripcion:
+      "Vuelo de 1h15min al amanecer sobre Punta Cana. Brindis con espumante, certificado de vuelo y desayuno tropical.",
+    incluye: [
+      "Vuelo de 1 hora 15 minutos",
+      "Brindis con espumante al aterrizar",
+      "Certificado de vuelo",
+      "Desayuno tropical incluido",
+    ],
+    aliados: [
+      ["Dominican Balloons", "Sábados y domingos al amanecer"],
+    ],
+    historia:
+      "Amanecer desde el cielo. El valle entero debajo de ti mientras el globo sube en silencio. Brindis al aterrizar y un desayuno que sabe a victoria.",
+    videoCategoria: VIDEO_AVENTURA,
+  },
+  {
+    id: 6,
     titulo: "Ritual de spa para dos",
     categoria: "Bienestar",
-    lugar: "Piantini",
+    lugar: "Piantini, Santo Domingo",
     personas: 2,
     rating: 4.8,
     precio: 7200,
@@ -88,356 +184,129 @@ export const PRODUCTOS: Producto[] = [
     colores: ["#3C1642", "#B07BAC"],
     etiqueta: "",
     descripcion:
-      "Masaje de 80 minutos a cuatro manos, exfoliación corporal, sauna y circuito de hidroterapia.",
+      "Masaje de 80 minutos a cuatro manos, exfoliación corporal, jacuzzi y copa de espumante.",
     incluye: [
       "Masaje de 80 minutos para dos",
-      "Exfoliación y sauna",
-      "Circuito de hidroterapia",
-      "Copa de espumante",
+      "Exfoliación corporal completa",
+      "Acceso a jacuzzi privado",
+      "Copa de espumante de cortesía",
     ],
     aliados: [
       ["SD Wellness — Blue Mall", "Todos los días con cita"],
       ["Ondavisión Spa", "Lunes a sábado"],
     ],
+    historia:
+      "Ochenta minutos de masaje a cuatro manos. Exfoliación, jacuzzi, una copa de espumante. Sales flotando. Sales queriendo volver.",
+    videoCategoria: VIDEO_BIENESTAR,
   },
   {
-    id: 4,
-    titulo: "Catamarán al atardecer",
-    categoria: "Náutico",
-    lugar: "Bávaro",
-    personas: 2,
-    rating: 4.7,
-    precio: 6400,
-    precioAntes: 0,
-    glifo: "⛵",
-    colores: ["#0E6251", "#48C9B0"],
-    etiqueta: "Reserva ahora",
-    descripcion:
-      "Tres horas de navegación por la costa, con parada para snorkel y piscina natural. Barra abierta a bordo.",
-    incluye: [
-      "Barra abierta nacional",
-      "Snorkel con equipo",
-      "Música en vivo los viernes",
-      "Para dos personas",
-    ],
-    aliados: [
-      ["Bávaro Sailing", "Salidas 15:30 diarias"],
-      ["Ocean Adventures", "Miércoles a domingo"],
-    ],
-  },
-  {
-    id: 5,
-    titulo: "Una noche en villa frente al mar",
+    id: 7,
+    titulo: "Noche en villa boutique frente al mar",
     categoria: "Estadías",
-    lugar: "Las Terrenas",
+    lugar: "Las Terrenas, Samaná",
     personas: 2,
     rating: 4.9,
-    precio: 23500,
+    precio: 9900,
     precioAntes: 0,
     glifo: "🏨",
     colores: ["#7E5109", "#F5B041"],
     etiqueta: "",
     descripcion:
-      "Villa privada con piscina y desayuno servido en la terraza. Check-out tardío sin costo.",
+      "Villa privada con piscina, desayuno en la terraza mirando el Atlántico y late checkout.",
     incluye: [
       "Villa completa para dos",
-      "Desayuno en la terraza",
+      "Desayuno servido en la terraza",
       "Piscina privada",
-      "Check-out a las 15:00",
+      "Late check-out sin costo",
     ],
     aliados: [
-      ["Villa Aliseo", "Sujeto a disponibilidad"],
-      ["Casa Cosón", "Todo el año"],
+      ["Saman Boutique Hotel", "Sujeto a disponibilidad"],
     ],
-  },
-  {
-    id: 6,
-    titulo: "Curso de kitesurf para principiantes",
-    categoria: "Aventura",
-    lugar: "Cabarete",
-    personas: 1,
-    rating: 4.8,
-    precio: 11800,
-    precioAntes: 13500,
-    glifo: "🪁",
-    colores: ["#154360", "#5499C7"],
-    etiqueta: "",
-    descripcion:
-      "Tres días de clases en la capital mundial del kitesurf. No necesitas experiencia previa.",
-    incluye: [
-      "9 horas de clase en 3 días",
-      "Equipo completo incluido",
-      "Instructor IKO certificado",
-      "Máximo 3 alumnos por grupo",
-    ],
-    aliados: [
-      ["Cabarete Kite School", "Todo el año según viento"],
-      ["Laurel Eastman", "Octubre a agosto"],
-    ],
-  },
-  {
-    id: 7,
-    titulo: "Avistamiento de ballenas jorobadas",
-    categoria: "Aventura",
-    lugar: "Samaná",
-    personas: 2,
-    rating: 4.9,
-    precio: 5200,
-    precioAntes: 0,
-    glifo: "🐋",
-    colores: ["#0B3D3B", "#45B39D"],
-    etiqueta: "Temporada",
-    descripcion:
-      "Salida en bote a la bahía de Samaná con guía biólogo. Del 15 de enero al 25 de marzo.",
-    incluye: [
-      "Bote con guía biólogo",
-      "Chaleco y seguro",
-      "Café y frutas a bordo",
-      "Para dos personas",
-    ],
-    aliados: [["Whale Samaná", "15 de enero al 25 de marzo"]],
+    historia:
+      "Te despiertas con el sonido del mar. Piscina privada. Desayuno en la terraza mirando el Atlántico. Check-out cuando tú quieras.",
+    videoCategoria: VIDEO_ESTADIAS,
   },
   {
     id: 8,
-    titulo: "Buceo en la Isla Catalina",
-    categoria: "Náutico",
-    lugar: "Bayahíbe",
-    personas: 1,
-    rating: 4.8,
-    precio: 9600,
-    precioAntes: 0,
-    glifo: "🤿",
-    colores: ["#1A5276", "#7FB3D5"],
-    etiqueta: "Reserva online",
-    descripcion:
-      "Dos inmersiones en la pared de Catalina, uno de los mejores arrecifes del Caribe.",
-    incluye: [
-      "Dos inmersiones guiadas",
-      "Equipo completo",
-      "Almuerzo en la isla",
-      "Traslado en bote",
-    ],
-    aliados: [
-      ["Bayahíbe Divers", "Martes a domingo"],
-      ["Casa Daniel", "Todo el año"],
-    ],
-  },
-  {
-    id: 9,
     titulo: "Ruta del café y cascada",
     categoria: "Cultura",
     lugar: "Jarabacoa",
     personas: 2,
     rating: 4.6,
-    precio: 3400,
+    precio: 3200,
     precioAntes: 4200,
     glifo: "☕",
     colores: ["#4D3319", "#A9714B"],
     etiqueta: "",
     descripcion:
-      "Finca cafetalera, tueste y cata, y caminata a la cascada Jimenoa. Día completo con almuerzo.",
+      "Tour de finca cafetalera, tueste y cata de café, almuerzo típico y caminata a la cascada Jimenoa.",
     incluye: [
-      "Tour de finca con cata",
-      "Almuerzo típico",
-      "Entrada a la cascada",
-      "Guía local",
+      "Tour de finca con tueste y cata",
+      "Almuerzo típico dominicano",
+      "Entrada a cascada Jimenoa",
+      "Guía local bilingüe",
     ],
     aliados: [
-      ["Finca Alta Gracia", "Miércoles a domingo"],
+      ["Finca Monte Alto", "Miércoles a domingo"],
       ["Rancho Baiguate", "Todos los días"],
     ],
+    historia:
+      "Caminas entre cafetales a mil metros de altura. Tuestas tu propio café. Almuerzas en la montaña. Y terminas bajo una cascada de 40 metros.",
+    videoCategoria: VIDEO_CULTURA,
+  },
+  {
+    id: 9,
+    titulo: "Avistamiento de ballenas jorobadas",
+    categoria: "Aventura",
+    lugar: "Samaná",
+    personas: 2,
+    rating: 4.9,
+    precio: 4800,
+    precioAntes: 0,
+    glifo: "🐋",
+    colores: ["#0B3D3B", "#45B39D"],
+    etiqueta: "Temporada Ene-Mar",
+    descripcion:
+      "Salida en bote con guía biólogo a la bahía de Samaná. Temporada de enero a marzo.",
+    incluye: [
+      "Bote con guía biólogo marino",
+      "Chaleco y seguro incluidos",
+      "Café y frutas tropicales a bordo",
+      "Para dos personas",
+    ],
+    aliados: [
+      ["Whale Samaná", "15 de enero al 25 de marzo"],
+    ],
+    historia:
+      "Cada invierno, miles de ballenas jorobadas llegan a la bahía de Samaná a tener sus crías. Verlas saltar a metros de tu bote es algo que no se puede explicar.",
+    videoCategoria: VIDEO_AVENTURA,
   },
   {
     id: 10,
-    titulo: "Cata de ron dominicano premium",
+    titulo: "Cena degustación del chef",
     categoria: "Gastronomía",
-    lugar: "Zona Colonial",
-    personas: 2,
-    rating: 4.7,
-    precio: 2900,
-    precioAntes: 0,
-    glifo: "🥃",
-    colores: ["#5D2F0E", "#C77C3C"],
-    etiqueta: "",
-    descripcion:
-      "Cata guiada de seis rones añejos con maridaje de chocolate y tabaco.",
-    incluye: [
-      "Seis rones añejos",
-      "Maridaje de chocolate",
-      "Sommelier de ron",
-      "Para dos personas",
-    ],
-    aliados: [["Ron Bar Zona Colonial", "Jueves a sábado · 20:00"]],
-  },
-  {
-    id: 11,
-    titulo: "Clase privada de cocina dominicana",
-    categoria: "Cultura",
-    lugar: "Santiago",
+    lugar: "Zona Colonial, Santo Domingo",
     personas: 2,
     rating: 4.9,
-    precio: 4100,
-    precioAntes: 0,
-    glifo: "👩‍🍳",
-    colores: ["#7B241C", "#E59866"],
-    etiqueta: "",
-    descripcion:
-      "Cocinas y te comes un sancocho, tostones y habichuelas con dulce, con una cocinera de la casa.",
-    incluye: [
-      "Clase de 3 horas",
-      "Todos los ingredientes",
-      "Almuerzo con lo que cocinaste",
-      "Recetario para llevar",
-    ],
-    aliados: [["Cocina de Doña Elba", "Sábados · 10:00"]],
-  },
-  {
-    id: 12,
-    titulo: "Brunch con vista al Malecón",
-    categoria: "Gastronomía",
-    lugar: "Santo Domingo",
-    personas: 2,
-    rating: 4.5,
-    precio: 3600,
-    precioAntes: 4300,
-    glifo: "🥂",
-    colores: ["#1C4E80", "#8AB6D6"],
-    etiqueta: "",
-    descripcion:
-      "Brunch de domingo con mimosas ilimitadas durante dos horas y vista al mar Caribe.",
-    incluye: [
-      "Brunch buffet para dos",
-      "Mimosas ilimitadas 2 horas",
-      "Mesa junto a la ventana",
-    ],
-    aliados: [["Terraza Malecón", "Domingos · 11:00 a 15:00"]],
-  },
-  {
-    id: 13,
-    titulo: "Masaje descontracturante 60 min",
-    categoria: "Bienestar",
-    lugar: "Naco",
-    personas: 1,
-    rating: 4.6,
-    precio: 2400,
-    precioAntes: 0,
-    glifo: "🧖",
-    colores: ["#4A235A", "#BB8FCE"],
+    precio: 8500,
+    precioAntes: 10500,
+    glifo: "🍽️",
+    colores: ["#6E2C00", "#D68910"],
     etiqueta: "Reserva online",
     descripcion:
-      "Masaje profundo de espalda, cuello y hombros con aceites tibios.",
-    incluye: ["60 minutos de masaje", "Aceites esenciales", "Té de cortesía"],
-    aliados: [
-      ["Zen Spa Naco", "Lunes a sábado"],
-      ["Aura Wellness", "Todos los días"],
-    ],
-  },
-  {
-    id: 14,
-    titulo: "Concierto en Altos de Chavón",
-    categoria: "Eventos",
-    lugar: "La Romana",
-    personas: 2,
-    rating: 4.9,
-    precio: 14500,
-    precioAntes: 0,
-    glifo: "🎤",
-    colores: ["#2C1A47", "#7D5BA6"],
-    etiqueta: "Últimos cupos",
-    descripcion:
-      "Dos entradas al anfiteatro griego con vista al río Chavón. Fecha a elegir de la cartelera.",
+      "Menú de 8 tiempos con maridaje en una casona del siglo XVII. Cocina abierta, solo 12 asientos por noche.",
     incluye: [
-      "Dos entradas preferenciales",
-      "Acceso al pueblo artesanal",
-      "Estacionamiento incluido",
-    ],
-    aliados: [["Anfiteatro Altos de Chavón", "Según cartelera"]],
-  },
-  {
-    id: 15,
-    titulo: "Noche de comedia en vivo",
-    categoria: "Eventos",
-    lugar: "Santo Domingo",
-    personas: 2,
-    rating: 4.4,
-    precio: 2200,
-    precioAntes: 2800,
-    glifo: "🎭",
-    colores: ["#7D1128", "#D36B7A"],
-    etiqueta: "",
-    descripcion:
-      "Show de stand-up con tres comediantes dominicanos y dos tragos incluidos.",
-    incluye: ["Dos entradas", "Dos tragos incluidos", "Mesa reservada"],
-    aliados: [["Comedy Club RD", "Viernes y sábados · 21:00"]],
-  },
-  {
-    id: 16,
-    titulo: "Escapada de un día a Isla Saona",
-    categoria: "Aventura",
-    lugar: "Bayahíbe",
-    personas: 2,
-    rating: 4.8,
-    precio: 7800,
-    precioAntes: 9200,
-    glifo: "🏝️",
-    colores: ["#0A6E70", "#5DD3C6"],
-    etiqueta: "Reserva ahora",
-    descripcion:
-      "Catamarán y lancha rápida, piscina natural, almuerzo buffet en la playa y barra abierta.",
-    incluye: [
-      "Traslado ida y vuelta",
-      "Almuerzo buffet",
-      "Barra abierta",
-      "Guía en español e inglés",
+      "Ocho tiempos para dos personas",
+      "Maridaje de vinos incluido",
+      "Mesa reservada a tu nombre",
+      "Cocina abierta del chef",
     ],
     aliados: [
-      ["Saona Dreams", "Todos los días"],
-      ["Isla Tour RD", "Lunes a sábado"],
+      ["Fine Dining Zona Colonial", "Martes a sábado · 19:00 y 21:00"],
     ],
-  },
-  {
-    id: 17,
-    titulo: "Vuelo en globo aerostático",
-    categoria: "Aventura",
-    lugar: "Constanza",
-    personas: 2,
-    rating: 5.0,
-    precio: 26500,
-    precioAntes: 0,
-    glifo: "🎈",
-    colores: ["#123C69", "#AC3B61"],
-    etiqueta: "Exclusivo",
-    descripcion:
-      "Amanecer sobre el valle de Constanza, con brindis al aterrizar y certificado de vuelo.",
-    incluye: [
-      "Vuelo de 45 minutos",
-      "Brindis al aterrizar",
-      "Certificado de vuelo",
-      "Traslado desde el hotel",
-    ],
-    aliados: [["Constanza Balloons", "Sábados y domingos al amanecer"]],
-  },
-  {
-    id: 18,
-    titulo: "Suite con jacuzzi frente al mar",
-    categoria: "Estadías",
-    lugar: "Cap Cana",
-    personas: 2,
-    rating: 4.9,
-    precio: 31000,
-    precioAntes: 36000,
-    glifo: "🛁",
-    colores: ["#0B3C5D", "#328CC1"],
-    etiqueta: "",
-    descripcion:
-      "Una noche en suite con terraza privada, jacuzzi y desayuno para dos.",
-    incluye: [
-      "Suite con jacuzzi privado",
-      "Desayuno para dos",
-      "Acceso a playa y piscina",
-      "Late check-out",
-    ],
-    aliados: [["Cap Cana Resort", "Sujeto a disponibilidad"]],
+    historia:
+      "Una casona del siglo XVII. Doce asientos. Ocho tiempos con maridaje. El chef cocina frente a ti. Cada plato cuenta una historia del Caribe.",
+    videoCategoria: VIDEO_GASTRONOMIA,
   },
 ];
 
@@ -451,45 +320,73 @@ export const FILAS: Fila[] = [
   {
     id: "lo-mas",
     titulo: "Lo más regalado",
-    filtro: (p) => [2, 1, 5, 16, 4, 3].includes(p.id),
+    filtro: (p) => [1, 2, 5, 6, 10, 7].includes(p.id),
   },
   {
     id: "ofertas",
     titulo: "Ofertas de la semana",
     filtro: (p) => p.precioAntes > 0,
   },
-  {
-    id: "gastro",
-    titulo: "Gastronomía y bebidas",
-    filtro: (p) => p.categoria === "Gastronomía",
-  },
+];
+
+export type CatSection = {
+  id: string;
+  titulo: string;
+  categoria: Categoria;
+  gradiente: string;
+  videoUrl: string;
+};
+
+export const SECCIONES_CAT: CatSection[] = [
   {
     id: "aventura",
-    titulo: "Deportes y actividades al aire libre",
-    filtro: (p) => p.categoria === "Aventura" || p.categoria === "Náutico",
+    titulo: "Aventura y adrenalina",
+    categoria: "Aventura",
+    gradiente: "linear-gradient(135deg, #0F3460 0%, #1a6fa0 50%, #3E92CC 100%)",
+    videoUrl: VIDEO_AVENTURA,
   },
   {
-    id: "hoteles",
-    titulo: "Hoteles y lugares increíbles",
-    filtro: (p) => p.categoria === "Estadías",
+    id: "nautico",
+    titulo: "Mar y navegación",
+    categoria: "Náutico",
+    gradiente: "linear-gradient(135deg, #0E6251 0%, #1a8a7a 50%, #48C9B0 100%)",
+    videoUrl: VIDEO_NAUTICO,
   },
   {
     id: "bienestar",
-    titulo: "Estar bien",
-    filtro: (p) => p.categoria === "Bienestar",
+    titulo: "Bienestar y spa",
+    categoria: "Bienestar",
+    gradiente: "linear-gradient(135deg, #3C1642 0%, #6b3a70 50%, #B07BAC 100%)",
+    videoUrl: VIDEO_BIENESTAR,
   },
   {
-    id: "eventos",
-    titulo: "Eventos",
-    filtro: (p) => p.categoria === "Eventos" || p.categoria === "Cultura",
+    id: "gastronomia",
+    titulo: "Gastronomía y sabor",
+    categoria: "Gastronomía",
+    gradiente: "linear-gradient(135deg, #6E2C00 0%, #a05a1a 50%, #D68910 100%)",
+    videoUrl: VIDEO_GASTRONOMIA,
+  },
+  {
+    id: "estadias",
+    titulo: "Estadías y escapes",
+    categoria: "Estadías",
+    gradiente: "linear-gradient(135deg, #7E5109 0%, #b07a2a 50%, #F5B041 100%)",
+    videoUrl: VIDEO_ESTADIAS,
+  },
+  {
+    id: "cultura",
+    titulo: "Cultura y naturaleza",
+    categoria: "Cultura",
+    gradiente: "linear-gradient(135deg, #4D3319 0%, #7a5a3a 50%, #A9714B 100%)",
+    videoUrl: VIDEO_CULTURA,
   },
 ];
 
 export const CATEGORIAS: { cat: Categoria; icono: string; nombre: string }[] = [
-  { cat: "Gastronomía", icono: "🍽️", nombre: "Gastronomía" },
-  { cat: "Bienestar", icono: "💆", nombre: "Bienestar y spa" },
   { cat: "Aventura", icono: "🪂", nombre: "Aventura" },
-  { cat: "Estadías", icono: "🏨", nombre: "Estadías" },
   { cat: "Náutico", icono: "⛵", nombre: "Náutico" },
-  { cat: "Cultura", icono: "🎭", nombre: "Cultura y talleres" },
+  { cat: "Bienestar", icono: "💆", nombre: "Bienestar y spa" },
+  { cat: "Gastronomía", icono: "🍽️", nombre: "Gastronomía" },
+  { cat: "Estadías", icono: "🏨", nombre: "Estadías" },
+  { cat: "Cultura", icono: "☕", nombre: "Cultura y naturaleza" },
 ];
