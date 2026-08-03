@@ -82,7 +82,7 @@ export function PieSitio() {
         <div className="footer-grid">
           <div>
             <p className="intro">
-              Regalar Yupii es <a href="#">regalar momentos inolvidables</a>: experiencias únicas de
+              Regalar Yupii® es <a href="#">regalar momentos inolvidables</a>: experiencias únicas de
               gastronomía, spa, estadías, aventura y más.
             </p>
           </div>
@@ -125,7 +125,7 @@ export function PieSitio() {
 
         <div className="footer-bajo">
           <span className="pais">
-            <Logo size={16} />
+            🇩🇴
             República Dominicana
           </span>
           <a href="#">Políticas y garantías</a>
@@ -136,12 +136,9 @@ export function PieSitio() {
         </div>
 
         <p className="legal-nota">
-          Prototipo de demostración. Yupii no es una empresa constituida: precios, aliados,
-          calificaciones y disponibilidad son ficticios.
+          © 2026 Yupii®. Todos los derechos reservados. Experiencias únicas para regalar en República Dominicana.
           <br />
-          Antes de operar hay que definir con abogado dominicano la vigencia y las condiciones del
-          voucher frente a la Ley 358-05 y ProConsumidor, y el tratamiento fiscal de los montos no
-          canjeados.
+          Las experiencias, precios y disponibilidad están sujetos a cambios. Válido según términos y condiciones.
         </p>
       </div>
     </footer>
