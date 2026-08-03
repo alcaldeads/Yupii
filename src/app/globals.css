@@ -437,39 +437,6 @@ video.cat-section-video-bg {
   pointer-events: none;
 }
 
-/* YouTube wrap — hidden until playing, then fades in */
-.cat-section-yt-wrap {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  overflow: hidden;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 1.2s ease;
-}
-.cat-section-yt-wrap.visible {
-  opacity: 1;
-}
-/* Blocker div on top of iframe — prevents YouTube hover controls */
-.cat-section-yt-wrap::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-}
-.cat-section-yt-wrap iframe {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 177.78vh;
-  height: 56.25vw;
-  min-width: 100%;
-  min-height: 100%;
-  transform: translate(-50%, -50%);
-  border: 0;
-  pointer-events: none;
-}
-
 .cat-section-gradient {
   position: absolute;
   inset: 0;
@@ -1048,7 +1015,7 @@ video.cat-section-video-bg {
   .cat-riel-flecha { display: none; }
   .cat-section-content { padding: 48px 0; }
   .cat-section-title { font-size: 1.4rem; margin-bottom: 20px; }
-  .cat-section-video-bg, .cat-section-yt-wrap { display: none; }
+  .cat-section-video-bg { display: none; }
   .glass-card { min-width: 230px; max-width: 230px; }
   .modal-historia { min-height: 180px; }
   .modal-historia-texto { font-size: 0.92rem; }
