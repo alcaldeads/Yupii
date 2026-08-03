@@ -7,9 +7,17 @@ import { rd } from "@/lib/format";
 import { Chevron, Estrella, Pin, Personas } from "./Icons";
 
 /* ------------------------------------------------------------------ */
-/*  YouTube Background — invisible until playing, then fades in        */
+/*  YouTube Background — invisible until playing, loops start→end      */
 /* ------------------------------------------------------------------ */
-function YouTubeBg({ videoId, start = 0 }: { videoId: string; start?: number }) {
+function YouTubeBg({
+  videoId,
+  start = 0,
+  end,
+}: {
+  videoId: string;
+  start?: number;
+  end?: number;
+}) {
   const ref = useRef<HTMLDivElement>(null);
   const [playing, setPlaying] = useState(false);
 
@@ -19,8 +27,14 @@ function YouTubeBg({ videoId, start = 0 }: { videoId: string; start?: number }) 
     el.id = `ytbg-${videoId}-${Math.random().toString(36).slice(2, 7)}`;
     ref.current.appendChild(el);
 
-    const YT = (window as unknown as { YT: { Player: new (id: string, opts: unknown) => unknown } }).YT;
-    new YT.Player(el.id, {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const YT = (window as any).YT;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let player: any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let interval: any;
+
+    player = new YT.Player(el.id, {
       videoId,
       playerVars: {
         autoplay: 1,
@@ -34,20 +48,43 @@ function YouTubeBg({ videoId, start = 0 }: { videoId: string; start?: number }) 
         disablekb: 1,
         fs: 0,
         start,
-        loop: 1,
-        playlist: videoId,
+        end,
       },
       events: {
+        onReady: () => {
+          player.playVideo();
+        },
         onStateChange: (e: { data: number }) => {
-          // 1 = playing
-          if (e.data === 1) setPlaying(true);
+          if (e.data === 1) {
+            // Playing — show video
+            setPlaying(true);
+
+            // If we have an end time, poll to loop back to start
+            if (end) {
+              clearInterval(interval);
+              interval = setInterval(() => {
+                const t = player.getCurrentTime?.();
+                if (t >= end) {
+                  player.seekTo(start, true);
+                }
+              }, 500);
+            }
+          }
+          // If video ended or paused, restart
+          if (e.data === 0 || e.data === 2) {
+            player.seekTo(start, true);
+            player.playVideo();
+          }
         },
       },
     });
-  }, [videoId, start]);
+
+    return () => clearInterval(interval);
+  }, [videoId, start, end]);
 
   useEffect(() => {
-    const w = window as unknown as { YT?: { Player?: unknown }; onYouTubeIframeAPIReady?: () => void };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const w = window as any;
     if (w.YT?.Player) {
       init();
       return;
@@ -94,7 +131,11 @@ export default function CategorySection({ section, productos, onAbrir }: Props) 
     <section className="cat-section" id={section.id}>
       {/* YouTube background — invisible until playing */}
       {section.youtubeId && (
-        <YouTubeBg videoId={section.youtubeId} start={section.youtubeStart} />
+        <YouTubeBg
+          videoId={section.youtubeId}
+          start={section.youtubeStart}
+          end={section.youtubeEnd}
+        />
       )}
 
       {/* MP4 video (if no YouTube) */}

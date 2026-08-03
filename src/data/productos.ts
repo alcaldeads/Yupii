@@ -410,6 +410,7 @@ export type CatSection = {
   videoUrl: string;
   youtubeId?: string;
   youtubeStart?: number;
+  youtubeEnd?: number;
 };
 
 export const SECCIONES_CAT: CatSection[] = [
@@ -437,6 +438,7 @@ export const SECCIONES_CAT: CatSection[] = [
     videoUrl: VIDEO_BIENESTAR,
     youtubeId: "aCpTijnpcik",
     youtubeStart: 20,
+    youtubeEnd: 56,
   },
   {
     id: "gastronomia",

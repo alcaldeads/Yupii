@@ -445,7 +445,7 @@ video.cat-section-video-bg {
   overflow: hidden;
   pointer-events: none;
   opacity: 0;
-  transition: opacity 1.5s ease;
+  transition: opacity 1.2s ease;
 }
 .cat-section-yt-wrap.visible {
   opacity: 1;
