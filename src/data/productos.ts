@@ -435,6 +435,8 @@ export const SECCIONES_CAT: CatSection[] = [
     categoria: "Bienestar",
     gradiente: "linear-gradient(135deg, #3C1642 0%, #6b3a70 50%, #B07BAC 100%)",
     videoUrl: VIDEO_BIENESTAR,
+    youtubeId: "aCpTijnpcik",
+    youtubeStart: 20,
   },
   {
     id: "gastronomia",

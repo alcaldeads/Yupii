@@ -1,11 +1,81 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useEffect, useState, useCallback } from "react";
 import type { CatSection } from "@/data/productos";
 import type { Producto } from "@/data/productos";
 import { rd } from "@/lib/format";
 import { Chevron, Estrella, Pin, Personas } from "./Icons";
 
+/* ------------------------------------------------------------------ */
+/*  YouTube Background — invisible until playing, then fades in        */
+/* ------------------------------------------------------------------ */
+function YouTubeBg({ videoId, start = 0 }: { videoId: string; start?: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [playing, setPlaying] = useState(false);
+
+  const init = useCallback(() => {
+    if (!ref.current) return;
+    const el = document.createElement("div");
+    el.id = `ytbg-${videoId}-${Math.random().toString(36).slice(2, 7)}`;
+    ref.current.appendChild(el);
+
+    const YT = (window as unknown as { YT: { Player: new (id: string, opts: unknown) => unknown } }).YT;
+    new YT.Player(el.id, {
+      videoId,
+      playerVars: {
+        autoplay: 1,
+        mute: 1,
+        controls: 0,
+        showinfo: 0,
+        rel: 0,
+        iv_load_policy: 3,
+        modestbranding: 1,
+        playsinline: 1,
+        disablekb: 1,
+        fs: 0,
+        start,
+        loop: 1,
+        playlist: videoId,
+      },
+      events: {
+        onStateChange: (e: { data: number }) => {
+          // 1 = playing
+          if (e.data === 1) setPlaying(true);
+        },
+      },
+    });
+  }, [videoId, start]);
+
+  useEffect(() => {
+    const w = window as unknown as { YT?: { Player?: unknown }; onYouTubeIframeAPIReady?: () => void };
+    if (w.YT?.Player) {
+      init();
+      return;
+    }
+    if (!document.querySelector('script[src*="youtube.com/iframe_api"]')) {
+      const s = document.createElement("script");
+      s.src = "https://www.youtube.com/iframe_api";
+      document.head.appendChild(s);
+    }
+    const prev = w.onYouTubeIframeAPIReady;
+    w.onYouTubeIframeAPIReady = () => {
+      prev?.();
+      init();
+    };
+  }, [init]);
+
+  return (
+    <div
+      ref={ref}
+      className={`cat-section-yt-wrap${playing ? " visible" : ""}`}
+      aria-hidden="true"
+    />
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Main component                                                     */
+/* ------------------------------------------------------------------ */
 type Props = {
   section: CatSection;
   productos: Producto[];
@@ -22,18 +92,13 @@ export default function CategorySection({ section, productos, onAbrir }: Props) 
 
   return (
     <section className="cat-section" id={section.id}>
-      {/* Video de fondo — YouTube o MP4 */}
-      {section.youtubeId ? (
-        <iframe
-          className="cat-section-video-bg"
-          src={`https://www.youtube.com/embed/${section.youtubeId}?autoplay=1&mute=1&start=${section.youtubeStart || 0}&loop=1&playlist=${section.youtubeId}&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1&iv_load_policy=3&disablekb=1`}
-          allow="autoplay; encrypted-media"
-          allowFullScreen={false}
-          tabIndex={-1}
-          title=""
-          aria-hidden="true"
-        />
-      ) : section.videoUrl ? (
+      {/* YouTube background — invisible until playing */}
+      {section.youtubeId && (
+        <YouTubeBg videoId={section.youtubeId} start={section.youtubeStart} />
+      )}
+
+      {/* MP4 video (if no YouTube) */}
+      {!section.youtubeId && section.videoUrl && (
         <video
           className="cat-section-video-bg"
           autoPlay
@@ -45,9 +110,9 @@ export default function CategorySection({ section, productos, onAbrir }: Props) 
         >
           <source src={section.videoUrl} type="video/mp4" />
         </video>
-      ) : null}
+      )}
 
-      {/* Gradient fallback (behind video) */}
+      {/* Gradient fallback — always visible behind video */}
       <div className="cat-section-gradient" style={{ background: section.gradiente }} />
 
       {/* Overlay oscuro */}
