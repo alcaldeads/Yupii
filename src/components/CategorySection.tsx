@@ -22,18 +22,30 @@ export default function CategorySection({ section, productos, onAbrir }: Props) 
 
   return (
     <section className="cat-section" id={section.id}>
-      {/* Video background -- hidden on mobile via CSS */}
-      <video
-        className="cat-section-video"
-        autoPlay
-        muted
-        loop
-        playsInline
-        aria-hidden="true"
-        poster=""
-      >
-        <source src={section.videoUrl} type="video/mp4" />
-      </video>
+      {/* YouTube background (if available) -- hidden on mobile via CSS */}
+      {section.youtubeId ? (
+        <div className="cat-section-youtube" aria-hidden="true">
+          <iframe
+            src={`https://www.youtube.com/embed/${section.youtubeId}?autoplay=1&mute=1&start=${section.youtubeStart || 0}&loop=1&playlist=${section.youtubeId}&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1&iv_load_policy=3&disablekb=1`}
+            allow="autoplay; encrypted-media"
+            allowFullScreen={false}
+            tabIndex={-1}
+            title=""
+          />
+        </div>
+      ) : (
+        <video
+          className="cat-section-video"
+          autoPlay
+          muted
+          loop
+          playsInline
+          aria-hidden="true"
+          poster=""
+        >
+          <source src={section.videoUrl} type="video/mp4" />
+        </video>
+      )}
 
       {/* Gradient fallback (always visible, video overlays on desktop) */}
       <div className="cat-section-gradient" style={{ background: section.gradiente }} />

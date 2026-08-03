@@ -408,6 +408,8 @@ export type CatSection = {
   categoria: Categoria;
   gradiente: string;
   videoUrl: string;
+  youtubeId?: string;
+  youtubeStart?: number;
 };
 
 export const SECCIONES_CAT: CatSection[] = [
@@ -417,6 +419,8 @@ export const SECCIONES_CAT: CatSection[] = [
     categoria: "Aventura",
     gradiente: "linear-gradient(135deg, #0F3460 0%, #1a6fa0 50%, #3E92CC 100%)",
     videoUrl: VIDEO_AVENTURA,
+    youtubeId: "a-ABV-HpSXM",
+    youtubeStart: 23,
   },
   {
     id: "nautico",
