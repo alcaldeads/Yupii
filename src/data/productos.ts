@@ -26,6 +26,8 @@ export type Producto = {
   videoCategoria: string;
   imagen: string;
   imagenes: string[];
+  tipo?: string;
+  zona?: string;
 };
 
 const VIDEO_AVENTURA = "/video/aventura.mp4";
@@ -1138,11 +1140,15 @@ export const SECCIONES_CAT: CatSection[] = [
   },
 ];
 
-export const CATEGORIAS: { cat: Categoria; icono: string; nombre: string }[] = [
-  { cat: "Aventura", icono: "🪂", nombre: "Aventura" },
-  { cat: "Náutico", icono: "⛵", nombre: "Náutico" },
-  { cat: "Bienestar", icono: "💆", nombre: "Bienestar y spa" },
-  { cat: "Gastronomía", icono: "🍽️", nombre: "Gastronomía" },
-  { cat: "Estadías", icono: "🏨", nombre: "Estadías" },
-  { cat: "Cultura", icono: "☕", nombre: "Cultura y naturaleza" },
+export const CATEGORIAS: { cat: Categoria; icono: string; nombre: string; slug: string; descripcion: string }[] = [
+  { cat: "Aventura", icono: "🪂", nombre: "Aventura", slug: "aventura", descripcion: "Adrenalina pura — saltos, vuelos, expediciones y todo lo que acelera el corazón" },
+  { cat: "Náutico", icono: "⛵", nombre: "Náutico", slug: "nautico", descripcion: "El mar Caribe como protagonista — navegación, buceo, snorkel y atardeceres en el agua" },
+  { cat: "Bienestar", icono: "💆", nombre: "Bienestar y spa", slug: "bienestar", descripcion: "Desconecta del mundo — masajes, rituales de spa, yoga y momentos de paz total" },
+  { cat: "Gastronomía", icono: "🍽️", nombre: "Gastronomía", slug: "gastronomia", descripcion: "Los mejores restaurantes de Punta Cana — desde fine dining hasta beach clubs con los pies en la arena" },
+  { cat: "Estadías", icono: "🏨", nombre: "Estadías", slug: "estadias", descripcion: "Noches que se convierten en recuerdos — villas, boutiques y escapes frente al mar" },
+  { cat: "Cultura", icono: "☕", nombre: "Cultura y naturaleza", slug: "cultura", descripcion: "La República Dominicana auténtica — café, cascadas, historia y tradición" },
 ];
+
+export function catFromSlug(slug: string): Categoria | undefined {
+  return CATEGORIAS.find((c) => c.slug === slug)?.cat;
+}

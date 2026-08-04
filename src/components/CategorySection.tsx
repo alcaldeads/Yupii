@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import type { CatSection } from "@/data/productos";
 import type { Producto } from "@/data/productos";
+import { CATEGORIAS } from "@/data/productos";
 import { rd } from "@/lib/format";
 import { Chevron, Estrella, Pin, Personas } from "./Icons";
 
@@ -46,7 +47,17 @@ export default function CategorySection({ section, productos, onAbrir }: Props) 
       {/* Contenido encima */}
       <div className="cat-section-content">
         <div className="wrap">
-          <h2 className="cat-section-title">{section.titulo}</h2>
+          <div className="cat-section-header">
+            <h2 className="cat-section-title">{section.titulo}</h2>
+            {(() => {
+              const catInfo = CATEGORIAS.find((c) => c.cat === section.categoria);
+              return catInfo ? (
+                <a href={`/explorar/${catInfo.slug}`} className="cat-section-ver-todo">
+                  Ver todo el catálogo →
+                </a>
+              ) : null;
+            })()}
+          </div>
 
           <div className="cat-section-riel-wrap">
             <button
