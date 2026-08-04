@@ -2,7 +2,7 @@ export type Categoria =
   | "Gastronomía"
   | "Bienestar"
   | "Aventura"
-  | "Náutico"
+
   | "Estadías"
   | "Cultura"
   | "Niños y Familia";
@@ -32,7 +32,7 @@ export type Producto = {
 };
 
 const VIDEO_AVENTURA = "/video/aventura.mp4";
-const VIDEO_NAUTICO = "/video/nautico.mp4";
+
 const VIDEO_BIENESTAR = "/video/bienestar.mp4";
 const VIDEO_GASTRONOMIA = "/video/gastronomia.mp4";
 const VIDEO_ESTADIAS = "/video/estadias.mp4";
@@ -78,7 +78,7 @@ export const PRODUCTOS: Producto[] = [
     id: 2,
     slug: "catamaran-al-atardecer",
     titulo: "Catamarán al atardecer",
-    categoria: "Náutico",
+    categoria: "Aventura",
     lugar: "Bávaro",
     personas: 2,
     rating: 4.7,
@@ -101,7 +101,7 @@ export const PRODUCTOS: Producto[] = [
     ],
     historia:
       "El sol cae sobre el Caribe mientras brindas con la persona que más quieres. Tres horas de sal, brisa y música suave. Esto no se olvida.",
-    videoCategoria: VIDEO_NAUTICO,
+    videoCategoria: VIDEO_AVENTURA,
     imagen: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&q=80",
     imagenes: [
       "https://images.unsplash.com/photo-1500514966906-fe245eea9344?w=800&q=80",
@@ -148,7 +148,7 @@ export const PRODUCTOS: Producto[] = [
     id: 4,
     slug: "buceo-isla-catalina",
     titulo: "Buceo en Isla Catalina",
-    categoria: "Náutico",
+    categoria: "Aventura",
     lugar: "Bayahíbe",
     personas: 1,
     rating: 4.8,
@@ -171,7 +171,7 @@ export const PRODUCTOS: Producto[] = [
     ],
     historia:
       "Desciendes por El Muro de Catalina y el mundo cambia. Corales, peces tropicales, tortugas. Dos inmersiones en uno de los mejores arrecifes del Caribe.",
-    videoCategoria: VIDEO_NAUTICO,
+    videoCategoria: VIDEO_AVENTURA,
     imagen: "https://images.unsplash.com/photo-1544551763-77ef2d0cfc6c?w=800&q=80",
     imagenes: [
       "https://images.unsplash.com/photo-1582967788606-a171c1080cb0?w=800&q=80",
@@ -1325,13 +1325,6 @@ export const SECCIONES_CAT: CatSection[] = [
     videoUrl: "/video/aventura.mp4",
   },
   {
-    id: "nautico",
-    titulo: "Mar y navegación",
-    categoria: "Náutico",
-    gradiente: "linear-gradient(135deg, #0E6251 0%, #1a8a7a 50%, #48C9B0 100%)",
-    videoUrl: VIDEO_NAUTICO,
-  },
-  {
     id: "bienestar",
     titulo: "Bienestar y spa",
     categoria: "Bienestar",
@@ -1370,7 +1363,6 @@ export const SECCIONES_CAT: CatSection[] = [
 
 export const CATEGORIAS: { cat: Categoria; icono: string; nombre: string; slug: string; descripcion: string }[] = [
   { cat: "Aventura", icono: "🪂", nombre: "Aventura", slug: "aventura", descripcion: "Adrenalina pura — saltos, vuelos, expediciones y todo lo que acelera el corazón" },
-  { cat: "Náutico", icono: "⛵", nombre: "Náutico", slug: "nautico", descripcion: "El mar Caribe como protagonista — navegación, buceo, snorkel y atardeceres en el agua" },
   { cat: "Bienestar", icono: "💆", nombre: "Bienestar y spa", slug: "bienestar", descripcion: "Desconecta del mundo — masajes, rituales de spa, yoga y momentos de paz total" },
   { cat: "Gastronomía", icono: "🍽️", nombre: "Gastronomía", slug: "gastronomia", descripcion: "Los mejores restaurantes de Punta Cana — desde fine dining hasta beach clubs con los pies en la arena" },
   { cat: "Estadías", icono: "🏨", nombre: "Estadías", slug: "estadias", descripcion: "Noches que se convierten en recuerdos — villas, boutiques y escapes frente al mar" },
