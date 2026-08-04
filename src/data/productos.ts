@@ -28,12 +28,12 @@ export type Producto = {
   imagenes: string[];
 };
 
-const VIDEO_AVENTURA = "/videos/aventura.mp4";
-const VIDEO_NAUTICO = "/videos/nautico.mp4";
-const VIDEO_BIENESTAR = "/videos/bienestar.mp4";
-const VIDEO_GASTRONOMIA = "/videos/gastronomia.mp4";
-const VIDEO_ESTADIAS = "/videos/estadias.mp4";
-const VIDEO_CULTURA = "/videos/cultura.mp4";
+const VIDEO_AVENTURA = "/video/aventura.mp4";
+const VIDEO_NAUTICO = "/video/nautico.mp4";
+const VIDEO_BIENESTAR = "/video/bienestar.mp4";
+const VIDEO_GASTRONOMIA = "/video/gastronomia.mp4";
+const VIDEO_ESTADIAS = "/video/estadias.mp4";
+const VIDEO_CULTURA = "/video/cultura.mp4";
 
 export const PRODUCTOS: Producto[] = [
   {
