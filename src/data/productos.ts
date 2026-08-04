@@ -4,7 +4,8 @@ export type Categoria =
   | "Aventura"
   | "Náutico"
   | "Estadías"
-  | "Cultura";
+  | "Cultura"
+  | "Niños y Familia";
 
 export type Producto = {
   id: number;
@@ -36,6 +37,7 @@ const VIDEO_BIENESTAR = "/video/bienestar.mp4";
 const VIDEO_GASTRONOMIA = "/video/gastronomia.mp4";
 const VIDEO_ESTADIAS = "/video/estadias.mp4";
 const VIDEO_CULTURA = "/video/cultura.mp4";
+const VIDEO_NINOS = "/video/ninos.mp4";
 
 export const PRODUCTOS: Producto[] = [
   {
@@ -1066,6 +1068,225 @@ export const PRODUCTOS: Producto[] = [
       "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=800&q=80",
     ],
   },
+  // ─────────────────────────────────────────────────
+  // NIÑOS Y FAMILIA
+  // ─────────────────────────────────────────────────
+  {
+    id: 31,
+    slug: "nado-con-delfines",
+    titulo: "Nado con delfines en familia",
+    categoria: "Niños y Familia",
+    lugar: "Dolphin Explorer, Bávaro",
+    personas: 4,
+    rating: 4.9,
+    precio: 12500,
+    precioAntes: 0,
+    glifo: "🐬",
+    colores: ["#0984E3", "#74B9FF"],
+    etiqueta: "Reserva online",
+    descripcion:
+      "Nado interactivo con delfines para toda la familia. Incluye beso, abrazo, paseo dorsal y fotos profesionales. A partir de 4 años.",
+    incluye: [
+      "Nado interactivo de 30 minutos",
+      "Fotos y video profesional incluido",
+      "Briefing educativo sobre delfines",
+      "Para hasta 4 personas (2 adultos + 2 niños)",
+    ],
+    aliados: [
+      ["Dolphin Explorer", "Todos los días · 09:00, 11:00, 14:00"],
+    ],
+    historia:
+      "Los ojos de un niño cuando toca un delfín por primera vez. La risa cuando el delfín le da un beso. El abrazo familiar en el agua turquesa. Este no es un show — es un encuentro real con una de las criaturas más inteligentes del planeta. A partir de 4 años, toda la familia puede participar.",
+    videoCategoria: VIDEO_NINOS,
+    tipo: "Animales",
+    zona: "Bávaro",
+    imagen: "https://images.unsplash.com/photo-1607153333879-c174d265f1d2?w=800&q=80",
+    imagenes: [
+      "https://images.unsplash.com/photo-1570481662006-a3a1374699e8?w=800&q=80",
+      "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&q=80",
+      "https://images.unsplash.com/photo-1505118380757-91f5f5632de0?w=800&q=80",
+    ],
+  },
+  {
+    id: 32,
+    slug: "scape-park-aventura-familiar",
+    titulo: "Scape Park — aventura familiar",
+    categoria: "Niños y Familia",
+    lugar: "Cap Cana",
+    personas: 4,
+    rating: 4.8,
+    precio: 15800,
+    precioAntes: 0,
+    glifo: "🌴",
+    colores: ["#00B894", "#55EFC4"],
+    etiqueta: "Exclusivo",
+    descripcion:
+      "Parque de aventuras en Cap Cana: Hoyo Azul, tirolesas, cenotes, cuevas y senderos ecológicos. Todo el día para la familia.",
+    incluye: [
+      "Acceso full day a Scape Park",
+      "Hoyo Azul (cenote natural)",
+      "Tirolesas sobre el bosque",
+      "Para hasta 4 personas",
+    ],
+    aliados: [
+      ["Scape Park at Cap Cana", "Todos los días · 08:00–17:30"],
+    ],
+    historia:
+      "Un parque de aventuras enclavado en los acantilados de Cap Cana. El Hoyo Azul es un cenote natural de agua cristalina turquesa al pie de un acantilado de 75 metros — parece sacado de una película. Tirolesas sobre el bosque tropical, cuevas con petroglifos taínos y senderos ecológicos. Los niños no van a querer irse.",
+    videoCategoria: VIDEO_NINOS,
+    tipo: "Parque de aventuras",
+    zona: "Cap Cana",
+    imagen: "https://images.unsplash.com/photo-1501555088652-021faa106b9b?w=800&q=80",
+    imagenes: [
+      "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80",
+      "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=800&q=80",
+      "https://images.unsplash.com/photo-1482938289607-e9573fc25ebb?w=800&q=80",
+    ],
+  },
+  {
+    id: 33,
+    slug: "clase-chocolate-en-familia",
+    titulo: "Clase de chocolate para niños",
+    categoria: "Niños y Familia",
+    lugar: "ChocoMuseo, Downtown",
+    personas: 4,
+    rating: 4.7,
+    precio: 4200,
+    precioAntes: 5000,
+    glifo: "🍫",
+    colores: ["#6E2C00", "#D68910"],
+    etiqueta: "",
+    descripcion:
+      "Taller interactivo donde los niños hacen su propio chocolate desde el grano de cacao. Degustación y se llevan su creación a casa.",
+    incluye: [
+      "Taller de bean-to-bar de 90 minutos",
+      "Degustación de chocolates",
+      "Cada niño se lleva su chocolate",
+      "Para hasta 4 personas",
+    ],
+    aliados: [
+      ["ChocoMuseo Punta Cana", "Martes a sábado · 10:00 y 14:00"],
+    ],
+    historia:
+      "Los niños aprenden de dónde viene el chocolate — desde el grano de cacao dominicano hasta la barra. Tuestan, muelen, mezclan y crean su propia receta. Al final se llevan su chocolate personalizado a casa. Es educativo, delicioso y los papás también se divierten.",
+    videoCategoria: VIDEO_NINOS,
+    tipo: "Taller educativo",
+    zona: "Downtown",
+    imagen: "https://images.unsplash.com/photo-1481391319762-47dff72954d9?w=800&q=80",
+    imagenes: [
+      "https://images.unsplash.com/photo-1606312619070-d48b4c652a52?w=800&q=80",
+      "https://images.unsplash.com/photo-1511381939415-e44015466834?w=800&q=80",
+      "https://images.unsplash.com/photo-1488477181946-6428a0291777?w=800&q=80",
+    ],
+  },
+  {
+    id: 34,
+    slug: "cabalgata-en-la-playa",
+    titulo: "Cabalgata en la playa",
+    categoria: "Niños y Familia",
+    lugar: "Playa Bávaro",
+    personas: 4,
+    rating: 4.6,
+    precio: 6800,
+    precioAntes: 0,
+    glifo: "🐎",
+    colores: ["#7E5109", "#F5B041"],
+    etiqueta: "Reserva online",
+    descripcion:
+      "Paseo a caballo por la playa de Bávaro al atardecer. Caballos mansos aptos para niños desde 5 años. Guía bilingüe.",
+    incluye: [
+      "Paseo de 90 minutos por la playa",
+      "Caballos mansos para todas las edades",
+      "Guía bilingüe",
+      "Para hasta 4 personas",
+    ],
+    aliados: [
+      ["Rancho RD", "Todos los días · 08:00, 15:00 y 17:00 (sunset)"],
+    ],
+    historia:
+      "El sol cae sobre el Caribe mientras la familia entera cabalga por la arena de Bávaro. Los caballos son mansos y entrenados para niños. El guía cuenta historias de la zona. Es una de esas experiencias que los niños dibujan en la escuela cuando regresan a casa.",
+    videoCategoria: VIDEO_NINOS,
+    tipo: "Naturaleza",
+    zona: "Bávaro",
+    imagen: "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?w=800&q=80",
+    imagenes: [
+      "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=80",
+      "https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=800&q=80",
+      "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=800&q=80",
+    ],
+  },
+  {
+    id: 35,
+    slug: "snorkel-familiar-bavaro",
+    titulo: "Snorkel familiar en arrecife",
+    categoria: "Niños y Familia",
+    lugar: "Bávaro",
+    personas: 4,
+    rating: 4.7,
+    precio: 5500,
+    precioAntes: 6800,
+    glifo: "🐠",
+    colores: ["#0E6251", "#48C9B0"],
+    etiqueta: "",
+    descripcion:
+      "Excursión en bote a arrecife de coral con equipo de snorkel para toda la familia. Guía marino, chalecos para niños y fotos acuáticas.",
+    incluye: [
+      "Bote al arrecife (20 min)",
+      "Equipo de snorkel para todos",
+      "Chalecos flotadores para niños",
+      "Para hasta 4 personas",
+    ],
+    aliados: [
+      ["Marinarium Excursions", "Lunes a sábado · 09:00 y 13:00"],
+    ],
+    historia:
+      "El primer pez tropical que un niño ve debajo del agua le cambia la perspectiva del mundo. Arrecifes de coral, estrellas de mar, peces de todos los colores. Los guías marinos cuidan de toda la familia y las fotos acuáticas capturan esas caras de asombro que no tienen precio.",
+    videoCategoria: VIDEO_NINOS,
+    tipo: "Acuática",
+    zona: "Bávaro",
+    imagen: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&q=80",
+    imagenes: [
+      "https://images.unsplash.com/photo-1582967788606-a171c1080cb0?w=800&q=80",
+      "https://images.unsplash.com/photo-1505118380757-91f5f5632de0?w=800&q=80",
+      "https://images.unsplash.com/photo-1546026423-cc4642628d2b?w=800&q=80",
+    ],
+  },
+  {
+    id: 36,
+    slug: "tour-piratas-punta-cana",
+    titulo: "Tour de piratas para niños",
+    categoria: "Niños y Familia",
+    lugar: "Marina Cap Cana",
+    personas: 4,
+    rating: 4.8,
+    precio: 7200,
+    precioAntes: 0,
+    glifo: "🏴‍☠️",
+    colores: ["#2D3436", "#636E72"],
+    etiqueta: "Reserva online",
+    descripcion:
+      "Aventura en barco pirata con búsqueda del tesoro, disfraces, snorkel y parada en playa secreta. Los niños se convierten en capitanes.",
+    incluye: [
+      "Navegación en barco pirata (3 horas)",
+      "Búsqueda del tesoro con mapa",
+      "Disfraces y espadas de pirata",
+      "Para hasta 4 personas",
+    ],
+    aliados: [
+      ["Ocean Adventures", "Miércoles a domingo · 09:30"],
+    ],
+    historia:
+      "Un barco pirata real zarpa desde la marina de Cap Cana. Los niños reciben disfraces, espadas de espuma y un mapa del tesoro. Navegan hasta una playa secreta donde buscan el cofre escondido. Hay snorkel, hay gritos de '¡tierra a la vista!' y hay recuerdos que van a contar por años.",
+    videoCategoria: VIDEO_NINOS,
+    tipo: "Aventura",
+    zona: "Cap Cana",
+    imagen: "https://images.unsplash.com/photo-1534224039826-c7a0eda0e6b3?w=800&q=80",
+    imagenes: [
+      "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&q=80",
+      "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=80",
+      "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=800&q=80",
+    ],
+  },
 ];
 
 export type Fila = {
@@ -1138,6 +1359,13 @@ export const SECCIONES_CAT: CatSection[] = [
     gradiente: "linear-gradient(135deg, #4D3319 0%, #7a5a3a 50%, #A9714B 100%)",
     videoUrl: VIDEO_CULTURA,
   },
+  {
+    id: "ninos-familia",
+    titulo: "Niños y familia",
+    categoria: "Niños y Familia",
+    gradiente: "linear-gradient(135deg, #0984E3 0%, #74B9FF 50%, #55EFC4 100%)",
+    videoUrl: VIDEO_NINOS,
+  },
 ];
 
 export const CATEGORIAS: { cat: Categoria; icono: string; nombre: string; slug: string; descripcion: string }[] = [
@@ -1147,6 +1375,7 @@ export const CATEGORIAS: { cat: Categoria; icono: string; nombre: string; slug: 
   { cat: "Gastronomía", icono: "🍽️", nombre: "Gastronomía", slug: "gastronomia", descripcion: "Los mejores restaurantes de Punta Cana — desde fine dining hasta beach clubs con los pies en la arena" },
   { cat: "Estadías", icono: "🏨", nombre: "Estadías", slug: "estadias", descripcion: "Noches que se convierten en recuerdos — villas, boutiques y escapes frente al mar" },
   { cat: "Cultura", icono: "☕", nombre: "Cultura y naturaleza", slug: "cultura", descripcion: "La República Dominicana auténtica — café, cascadas, historia y tradición" },
+  { cat: "Niños y Familia", icono: "👨‍👩‍👧‍👦", nombre: "Niños y familia", slug: "ninos-familia", descripcion: "Experiencias que los niños van a dibujar en la escuela — delfines, piratas, chocolate y aventura" },
 ];
 
 export function catFromSlug(slug: string): Categoria | undefined {
