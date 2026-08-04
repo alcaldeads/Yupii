@@ -5,15 +5,8 @@ import type { Producto } from "@/data/productos";
 import { rd } from "@/lib/format";
 import { Estrella, Pin, Personas } from "@/components/Icons";
 
-type CatInfo = {
-  cat: string;
-  nombre: string;
-  slug: string;
-  descripcion: string;
-};
-
+type CatInfo = { cat: string; nombre: string; slug: string; descripcion: string };
 type Sort = "recomendados" | "precio-asc" | "precio-desc" | "rating";
-
 type Props = {
   cat: CatInfo;
   productos: Producto[];
@@ -28,6 +21,13 @@ export default function ExplorarClient({ cat, productos, zonas, tipos, videoUrl,
   const [tipo, setTipo] = useState<string | null>(null);
   const [sort, setSort] = useState<Sort>("recomendados");
 
+  // Featured = top 4 by rating (unfiltered, always shown in showcase)
+  const featured = useMemo(() =>
+    [...productos].sort((a, b) => b.rating - a.rating).slice(0, 4),
+    [productos]
+  );
+
+  // Filtered for grid
   const filtered = useMemo(() => {
     let result = [...productos];
     if (zona) result = result.filter((p) => p.zona === zona);
@@ -45,150 +45,125 @@ export default function ExplorarClient({ cat, productos, zonas, tipos, videoUrl,
   const hasFilters = zona || tipo || sort !== "recomendados";
 
   return (
-    <div className="exp-page-wrap">
-      {/* Ambient background */}
-      <div className="exp-ambient" style={gradiente ? { background: gradiente } : undefined} />
-      <div className="exp-ambient-orb exp-orb-1" />
-      <div className="exp-ambient-orb exp-orb-2" />
-
-      {/* Hero */}
-      <section className="exp-hero-full">
+    <div className="showcase">
+      {/* ─── HERO ─── */}
+      <section className="sc-hero">
         {videoUrl && (
-          <div className="exp-hero-video-wrap">
-            <video autoPlay muted loop playsInline preload="auto" className="exp-hero-video">
-              <source src={videoUrl} type="video/mp4" />
-            </video>
-          </div>
+          <video className="sc-hero-video" autoPlay muted loop playsInline preload="auto">
+            <source src={videoUrl} type="video/mp4" />
+          </video>
         )}
-        <div className="exp-hero-overlay" />
-        <div className="exp-hero-content">
-          <a href="/" className="exp-hero-back">← Yupii</a>
+        {!videoUrl && gradiente && <div className="sc-hero-grad" style={{ background: gradiente }} />}
+        <div className="sc-hero-overlay" />
+        <div className="sc-hero-content">
+          <a href="/" className="sc-back">← Yupii</a>
           <h1>{cat.nombre}</h1>
           <p>{cat.descripcion}</p>
-          <div className="exp-hero-stat">
-            {productos.length} experiencia{productos.length !== 1 ? "s" : ""} disponibles
+          <div className="sc-hero-scroll-hint">
+            <span>Desliza para descubrir</span>
+            <div className="sc-scroll-line" />
           </div>
         </div>
-        <div className="exp-hero-fade" />
       </section>
 
-      {/* Sticky filter bar */}
-      <div className="exp-filter-bar">
-        <div className="exp-filter-inner">
-          {/* Zone pills */}
-          {zonas.length > 0 && (
-            <div className="exp-filter-group">
-              <button
-                className={`exp-pill${!zona ? " active" : ""}`}
-                onClick={() => setZona(null)}
-              >
-                Todas las zonas
-              </button>
-              {zonas.map((z) => (
-                <button
-                  key={z}
-                  className={`exp-pill${zona === z ? " active" : ""}`}
-                  onClick={() => setZona(zona === z ? null : z)}
-                >
-                  {z}
-                </button>
-              ))}
+      {/* ─── FEATURED SHOWCASE: each experience = full section ─── */}
+      {featured.map((p, i) => (
+        <section key={p.id} className={`sc-exp${i % 2 === 1 ? " sc-exp-flip" : ""}`}>
+          <div className="sc-exp-image">
+            <img src={p.imagen} alt={p.titulo} loading={i < 2 ? "eager" : "lazy"} />
+          </div>
+          <div className="sc-exp-content">
+            <span className="sc-exp-tag">
+              {p.lugar} · {p.personas} persona{p.personas > 1 ? "s" : ""}
+            </span>
+            <h2 className="sc-exp-title">{p.titulo}</h2>
+            <p className="sc-exp-body">{p.historia || p.descripcion}</p>
+            <div className="sc-exp-details">
+              <span className="sc-exp-rating"><Estrella size={14} /> {p.rating.toFixed(1)}</span>
+              <span className="sc-exp-price">{rd(p.precio)}</span>
+              {p.precioAntes > 0 && <span className="sc-exp-old">{rd(p.precioAntes)}</span>}
+            </div>
+            <a href={`/experiencia/${p.slug}`} className="sc-exp-cta">
+              Ver experiencia →
+            </a>
+          </div>
+        </section>
+      ))}
+
+      {/* ─── ALL EXPERIENCES GRID ─── */}
+      <section className="sc-grid-section" id="todas">
+        <div className="sc-grid-wrap">
+          <div className="sc-grid-header">
+            <h2>Todas las experiencias</h2>
+            <p>{productos.length} experiencias en {cat.nombre}</p>
+          </div>
+
+          {/* Filters */}
+          {(zonas.length > 0 || tipos.length > 0) && (
+            <div className="sc-filters">
+              <div className="sc-filter-row">
+                {zonas.length > 0 && zonas.map((z) => (
+                  <button
+                    key={z}
+                    className={`sc-pill${zona === z ? " on" : ""}`}
+                    onClick={() => setZona(zona === z ? null : z)}
+                  >
+                    {z}
+                  </button>
+                ))}
+                {tipos.length > 0 && tipos.map((t) => (
+                  <button
+                    key={t}
+                    className={`sc-pill sc-pill-t${tipo === t ? " on" : ""}`}
+                    onClick={() => setTipo(tipo === t ? null : t)}
+                  >
+                    {t}
+                  </button>
+                ))}
+              </div>
+              <div className="sc-filter-right">
+                <select className="sc-select" value={sort} onChange={(e) => setSort(e.target.value as Sort)}>
+                  <option value="recomendados">Recomendados</option>
+                  <option value="precio-asc">Precio ↑</option>
+                  <option value="precio-desc">Precio ↓</option>
+                  <option value="rating">Rating</option>
+                </select>
+                {hasFilters && <button className="sc-clear" onClick={clearFilters}>Limpiar</button>}
+              </div>
             </div>
           )}
 
-          {/* Type pills */}
-          {tipos.length > 0 && (
-            <div className="exp-filter-group">
-              {tipos.map((t) => (
-                <button
-                  key={t}
-                  className={`exp-pill exp-pill-type${tipo === t ? " active" : ""}`}
-                  onClick={() => setTipo(tipo === t ? null : t)}
-                >
-                  {t}
-                </button>
-              ))}
-            </div>
-          )}
-
-          {/* Sort + clear */}
-          <div className="exp-filter-right">
-            <select
-              className="exp-sort"
-              value={sort}
-              onChange={(e) => setSort(e.target.value as Sort)}
-            >
-              <option value="recomendados">Recomendados</option>
-              <option value="precio-asc">Precio ↑</option>
-              <option value="precio-desc">Precio ↓</option>
-              <option value="rating">Rating</option>
-            </select>
-            {hasFilters && (
-              <button className="exp-clear" onClick={clearFilters}>Limpiar</button>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Results */}
-      <main className="exp-results">
-        <div className="exp-results-info">
-          {filtered.length} resultado{filtered.length !== 1 ? "s" : ""}
-          {zona ? ` en ${zona}` : ""}
-          {tipo ? ` · ${tipo}` : ""}
-        </div>
-
-        {filtered.length === 0 ? (
-          <div className="exp-empty">
-            <p>No encontramos experiencias con esos filtros</p>
-            <button onClick={clearFilters}>Ver todas</button>
-          </div>
-        ) : (
-          <div className="exp-grid">
-            {filtered.map((p, i) => (
-              <a
-                key={p.id}
-                href={`/experiencia/${p.slug}`}
-                className="exp-card"
-                style={{ animationDelay: `${i * 60}ms` }}
-              >
-                <div className="exp-card-img">
-                  <div
-                    className="exp-card-bg"
-                    style={{ backgroundImage: `url(${p.imagen})` }}
-                  />
-                  <div className="exp-card-img-shade" />
-                  {p.etiqueta && (
-                    <span className={`exp-card-badge${p.etiqueta === "Exclusivo" ? " exclusive" : ""}${p.etiqueta.startsWith("Temporada") ? " season" : ""}`}>
-                      {p.etiqueta}
-                    </span>
-                  )}
-                  <span className="exp-card-rating">
-                    <Estrella size={11} /> {p.rating.toFixed(1)}
-                  </span>
+          {/* Grid */}
+          <div className="sc-grid">
+            {filtered.map((p) => (
+              <a key={p.id} href={`/experiencia/${p.slug}`} className="sc-card">
+                <div className="sc-card-img">
+                  <img src={p.imagen} alt={p.titulo} loading="lazy" />
+                  <span className="sc-card-rating"><Estrella size={10} /> {p.rating.toFixed(1)}</span>
                 </div>
-                <div className="exp-card-body">
+                <div className="sc-card-body">
                   <h3>{p.titulo}</h3>
-                  <p className="exp-card-desc">{p.descripcion}</p>
-                  <div className="exp-card-meta">
-                    <span><Pin size={11} /> {p.lugar}</span>
-                    <span><Personas size={11} /> {p.personas} pers.</span>
-                  </div>
-                  {p.tipo && <span className="exp-card-type">{p.tipo}</span>}
-                  <div className="exp-card-price">
+                  <span className="sc-card-loc"><Pin size={10} /> {p.lugar}</span>
+                  <div className="sc-card-bottom">
                     <strong>{rd(p.precio)}</strong>
-                    {p.precioAntes > 0 && <span className="exp-card-old">{rd(p.precioAntes)}</span>}
-                    <span className="exp-card-for">para {p.personas}</span>
+                    {p.precioAntes > 0 && <span className="sc-card-old">{rd(p.precioAntes)}</span>}
                   </div>
                 </div>
               </a>
             ))}
           </div>
-        )}
-      </main>
+
+          {filtered.length === 0 && (
+            <div className="sc-empty">
+              <p>Sin resultados con esos filtros</p>
+              <button onClick={clearFilters}>Ver todas</button>
+            </div>
+          )}
+        </div>
+      </section>
 
       {/* Footer */}
-      <footer className="exp-foot">
+      <footer className="sc-foot">
         <a href="/">← Volver a Yupii</a>
         <span>© 2026 Yupii®</span>
       </footer>
