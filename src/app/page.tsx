@@ -8,6 +8,7 @@ import FilaProductos from "@/components/FilaProductos";
 import CategorySection from "@/components/CategorySection";
 import { BandaCorporativa, Newsletter, PieSitio } from "@/components/Secciones";
 import Opiniones from "@/components/Opiniones";
+import Ocasiones from "@/components/Ocasiones";
 import FAQ from "@/components/FAQ";
 import ModalCanje from "@/components/ModalCanje";
 import ModalMensaje, { type Mensaje } from "@/components/ModalMensaje";
@@ -88,6 +89,8 @@ export default function Home() {
             onAbrir={abrirExperiencia}
           />
         ))}
+
+        <Ocasiones />
 
         <Opiniones />
 

@@ -1779,6 +1779,141 @@ video.cat-section-video-bg {
   }
 }
 
+/* ============ OCASIONES ============ */
+
+.ocasiones-section {
+  padding: 72px 0 80px;
+  background: var(--fondo-calido);
+}
+.ocasiones-header {
+  text-align: center;
+  margin-bottom: 44px;
+}
+.ocasiones-header h2 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin-bottom: 10px;
+}
+.ocasiones-header p {
+  color: var(--gris-txt);
+  font-size: 1.05rem;
+  max-width: 44ch;
+  margin: 0 auto;
+  line-height: 1.55;
+}
+
+.ocasiones-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+}
+
+.ocasion-card {
+  border-radius: 16px;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid var(--gris-borde);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 2px 8px rgba(0, 0, 0, 0.02);
+  transition: box-shadow 0.3s, transform 0.3s;
+}
+.ocasion-card:hover {
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.12);
+  transform: translateY(-4px);
+}
+
+.ocasion-card-img {
+  position: relative;
+  height: 170px;
+  overflow: hidden;
+}
+.ocasion-card-fondo {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  transition: transform 0.5s;
+}
+.ocasion-card:hover .ocasion-card-fondo { transform: scale(1.08); }
+.ocasion-card-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+.ocasion-card-texto {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 20px 16px 16px;
+  z-index: 2;
+  color: #fff;
+}
+.ocasion-card-texto h3 {
+  font-size: 1.15rem;
+  font-weight: 800;
+  margin-bottom: 4px;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.3);
+}
+.ocasion-card-texto p {
+  font-size: 0.78rem;
+  opacity: 0.9;
+  line-height: 1.4;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+.ocasion-sugerido {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  text-decoration: none;
+  color: inherit;
+  border-top: 1px solid var(--gris-borde);
+  transition: background 0.2s;
+}
+.ocasion-sugerido:hover { background: var(--gris-fondo); }
+.ocasion-sugerido img {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+.ocasion-sugerido-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+.ocasion-sugerido-label {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--acento);
+}
+.ocasion-sugerido-nombre {
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ocasion-sugerido-precio {
+  font-size: 0.75rem;
+  color: var(--gris-2);
+  font-weight: 600;
+}
+
+@media (max-width: 1000px) {
+  .ocasiones-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 560px) {
+  .ocasiones-grid { grid-template-columns: 1fr; }
+  .ocasiones-header h2 { font-size: 1.7rem; }
+}
+
 /* ============ EXPLORAR (CATALOG PAGE) ============ */
 
 .explorar-page {

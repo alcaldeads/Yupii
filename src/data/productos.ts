@@ -1152,3 +1152,79 @@ export const CATEGORIAS: { cat: Categoria; icono: string; nombre: string; slug: 
 export function catFromSlug(slug: string): Categoria | undefined {
   return CATEGORIAS.find((c) => c.slug === slug)?.cat;
 }
+
+export type Ocasion = {
+  id: string;
+  titulo: string;
+  subtitulo: string;
+  imagen: string;
+  color: string;
+  sugeridos: number[];
+};
+
+export const OCASIONES: Ocasion[] = [
+  {
+    id: "cumpleanos",
+    titulo: "Cumpleaños",
+    subtitulo: "Que lo celebre con algo que nunca va a olvidar",
+    imagen: "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=600&q=80",
+    color: "#E84393",
+    sugeridos: [14, 5, 21, 18],
+  },
+  {
+    id: "aniversario",
+    titulo: "Aniversario",
+    subtitulo: "Celebren juntos con una noche que cuente su historia",
+    imagen: "https://images.unsplash.com/photo-1529636798458-92182e662485?w=600&q=80",
+    color: "#D63031",
+    sugeridos: [14, 21, 11, 2],
+  },
+  {
+    id: "romantico",
+    titulo: "Noche romántica",
+    subtitulo: "Cena al atardecer, velas y la persona correcta",
+    imagen: "https://images.unsplash.com/photo-1559339352-11d035aa65de?w=600&q=80",
+    color: "#6C5CE7",
+    sugeridos: [21, 11, 14, 22],
+  },
+  {
+    id: "dia-madres",
+    titulo: "Día de las Madres",
+    subtitulo: "Dale lo que siempre dice que no necesita pero merece",
+    imagen: "https://images.unsplash.com/photo-1516627145497-ae6968895b74?w=600&q=80",
+    color: "#FDA7DF",
+    sugeridos: [6, 22, 25, 17],
+  },
+  {
+    id: "dia-padres",
+    titulo: "Día del Padre",
+    subtitulo: "Una experiencia a la altura de todo lo que ha dado",
+    imagen: "https://images.unsplash.com/photo-1542652694-40abf526446e?w=600&q=80",
+    color: "#0984E3",
+    sugeridos: [1, 15, 26, 5],
+  },
+  {
+    id: "navidad",
+    titulo: "Navidad",
+    subtitulo: "El regalo que no se envuelve — se vive",
+    imagen: "https://images.unsplash.com/photo-1512389142860-9c449e58a814?w=600&q=80",
+    color: "#00B894",
+    sugeridos: [14, 7, 22, 6],
+  },
+  {
+    id: "porque-si",
+    titulo: "Porque sí",
+    subtitulo: "No necesitas excusa para hacer feliz a alguien",
+    imagen: "https://images.unsplash.com/photo-1513151233558-d860c5398176?w=600&q=80",
+    color: "#FDCB6E",
+    sugeridos: [23, 28, 20, 8],
+  },
+  {
+    id: "despedida",
+    titulo: "Despedida",
+    subtitulo: "La última noche de soltero/a merece ser épica",
+    imagen: "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=600&q=80",
+    color: "#E17055",
+    sugeridos: [30, 23, 2, 1],
+  },
+];
