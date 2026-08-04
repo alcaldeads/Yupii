@@ -1,9 +1,15 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import dynamic from "next/dynamic";
 import type { Producto } from "@/data/productos";
 import { rd } from "@/lib/format";
 import { Estrella, Pin, Personas } from "@/components/Icons";
+
+const ExploreBackground = dynamic(
+  () => import("@/components/three/ExploreBackground"),
+  { ssr: false }
+);
 
 type CatInfo = { cat: string; nombre: string; slug: string; descripcion: string };
 type Sort = "recomendados" | "precio-asc" | "precio-desc" | "rating";
@@ -46,6 +52,7 @@ export default function ExplorarClient({ cat, productos, zonas, tipos, videoUrl,
 
   return (
     <div className="showcase">
+      <ExploreBackground />
       {/* ─── HERO ─── */}
       <section className="sc-hero">
         {videoUrl && (
