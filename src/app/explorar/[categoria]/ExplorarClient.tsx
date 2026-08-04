@@ -3,11 +3,10 @@
 import { useState, useMemo } from "react";
 import type { Producto } from "@/data/productos";
 import { rd } from "@/lib/format";
-import { Estrella, Pin, Personas, Chevron } from "@/components/Icons";
+import { Estrella, Pin, Personas } from "@/components/Icons";
 
 type CatInfo = {
   cat: string;
-  icono: string;
   nombre: string;
   slug: string;
   descripcion: string;
@@ -20,9 +19,11 @@ type Props = {
   productos: Producto[];
   zonas: string[];
   tipos: string[];
+  videoUrl?: string;
+  gradiente?: string;
 };
 
-export default function ExplorarClient({ cat, productos, zonas, tipos }: Props) {
+export default function ExplorarClient({ cat, productos, zonas, tipos, videoUrl, gradiente }: Props) {
   const [zona, setZona] = useState<string | null>(null);
   const [tipo, setTipo] = useState<string | null>(null);
   const [sort, setSort] = useState<Sort>("recomendados");
@@ -31,218 +32,166 @@ export default function ExplorarClient({ cat, productos, zonas, tipos }: Props) 
     let result = [...productos];
     if (zona) result = result.filter((p) => p.zona === zona);
     if (tipo) result = result.filter((p) => p.tipo === tipo);
-
     switch (sort) {
-      case "precio-asc":
-        result.sort((a, b) => a.precio - b.precio);
-        break;
-      case "precio-desc":
-        result.sort((a, b) => b.precio - a.precio);
-        break;
-      case "rating":
-        result.sort((a, b) => b.rating - a.rating);
-        break;
-      default:
-        result.sort((a, b) => b.rating - a.rating);
+      case "precio-asc": result.sort((a, b) => a.precio - b.precio); break;
+      case "precio-desc": result.sort((a, b) => b.precio - a.precio); break;
+      case "rating": result.sort((a, b) => b.rating - a.rating); break;
+      default: result.sort((a, b) => b.rating - a.rating);
     }
     return result;
   }, [productos, zona, tipo, sort]);
 
-  const clearFilters = () => {
-    setZona(null);
-    setTipo(null);
-    setSort("recomendados");
-  };
-
+  const clearFilters = () => { setZona(null); setTipo(null); setSort("recomendados"); };
   const hasFilters = zona || tipo || sort !== "recomendados";
 
   return (
-    <>
-      {/* Header */}
-      <header className="exp-header" style={{ borderBottom: "1px solid var(--gris-borde)" }}>
-        <div className="wrap">
-          <a href="/" className="exp-back">
-            <Chevron dir="izq" size={16} /> Volver al inicio
-          </a>
-        </div>
-      </header>
+    <div className="exp-page-wrap">
+      {/* Ambient background */}
+      <div className="exp-ambient" style={gradiente ? { background: gradiente } : undefined} />
+      <div className="exp-ambient-orb exp-orb-1" />
+      <div className="exp-ambient-orb exp-orb-2" />
 
-      <main className="explorar-page">
-        <div className="wrap">
-          {/* Hero */}
-          <section className="explorar-hero">
-            <span className="explorar-icono">{cat.icono}</span>
-            <h1>{cat.nombre}</h1>
-            <p className="explorar-desc">{cat.descripcion}</p>
-            <span className="explorar-count">
-              {productos.length} experiencia{productos.length !== 1 ? "s" : ""} disponibles
-            </span>
-          </section>
-
-          {/* Filters */}
-          <section className="explorar-filtros">
-            {/* Zones */}
-            {zonas.length > 0 && (
-              <div className="filtro-grupo">
-                <span className="filtro-label">Ubicación</span>
-                <div className="filtro-pills">
-                  <button
-                    className={`filtro-pill${!zona ? " activo" : ""}`}
-                    onClick={() => setZona(null)}
-                  >
-                    Todas
-                  </button>
-                  {zonas.map((z) => (
-                    <button
-                      key={z}
-                      className={`filtro-pill${zona === z ? " activo" : ""}`}
-                      onClick={() => setZona(zona === z ? null : z)}
-                    >
-                      {z}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Types */}
-            {tipos.length > 0 && (
-              <div className="filtro-grupo">
-                <span className="filtro-label">Tipo</span>
-                <div className="filtro-pills">
-                  <button
-                    className={`filtro-pill${!tipo ? " activo" : ""}`}
-                    onClick={() => setTipo(null)}
-                  >
-                    Todos
-                  </button>
-                  {tipos.map((t) => (
-                    <button
-                      key={t}
-                      className={`filtro-pill${tipo === t ? " activo" : ""}`}
-                      onClick={() => setTipo(tipo === t ? null : t)}
-                    >
-                      {t}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Sort + clear */}
-            <div className="filtro-grupo filtro-sort-row">
-              <div className="filtro-sort">
-                <span className="filtro-label">Ordenar</span>
-                <select
-                  className="filtro-select"
-                  value={sort}
-                  onChange={(e) => setSort(e.target.value as Sort)}
-                >
-                  <option value="recomendados">Más recomendados</option>
-                  <option value="precio-asc">Precio: menor a mayor</option>
-                  <option value="precio-desc">Precio: mayor a menor</option>
-                  <option value="rating">Mejor calificados</option>
-                </select>
-              </div>
-              {hasFilters && (
-                <button className="filtro-limpiar" onClick={clearFilters}>
-                  Limpiar filtros
-                </button>
-              )}
-            </div>
-          </section>
-
-          {/* Results count */}
-          <div className="explorar-resultados-info">
-            <span>
-              {filtered.length} resultado{filtered.length !== 1 ? "s" : ""}
-              {zona ? ` en ${zona}` : ""}
-              {tipo ? ` · ${tipo}` : ""}
-            </span>
+      {/* Hero */}
+      <section className="exp-hero-full">
+        {videoUrl && (
+          <div className="exp-hero-video-wrap">
+            <video autoPlay muted loop playsInline preload="auto" className="exp-hero-video">
+              <source src={videoUrl} type="video/mp4" />
+            </video>
           </div>
+        )}
+        <div className="exp-hero-overlay" />
+        <div className="exp-hero-content">
+          <a href="/" className="exp-hero-back">← Yupii</a>
+          <h1>{cat.nombre}</h1>
+          <p>{cat.descripcion}</p>
+          <div className="exp-hero-stat">
+            {productos.length} experiencia{productos.length !== 1 ? "s" : ""} disponibles
+          </div>
+        </div>
+        <div className="exp-hero-fade" />
+      </section>
 
-          {/* Grid */}
-          {filtered.length === 0 ? (
-            <div className="explorar-vacio">
-              <p>No encontramos experiencias con esos filtros.</p>
-              <button className="btn-borde" onClick={clearFilters}>
-                Ver todas las experiencias
+      {/* Sticky filter bar */}
+      <div className="exp-filter-bar">
+        <div className="exp-filter-inner">
+          {/* Zone pills */}
+          {zonas.length > 0 && (
+            <div className="exp-filter-group">
+              <button
+                className={`exp-pill${!zona ? " active" : ""}`}
+                onClick={() => setZona(null)}
+              >
+                Todas las zonas
               </button>
-            </div>
-          ) : (
-            <div className="explorar-grid">
-              {filtered.map((p) => (
-                <a
-                  key={p.id}
-                  href={`/experiencia/${p.slug}`}
-                  className="explorar-card"
+              {zonas.map((z) => (
+                <button
+                  key={z}
+                  className={`exp-pill${zona === z ? " active" : ""}`}
+                  onClick={() => setZona(zona === z ? null : z)}
                 >
-                  <div className="explorar-card-img">
-                    <div
-                      className="explorar-card-fondo"
-                      style={{
-                        backgroundImage: `url(${p.imagen})`,
-                        backgroundSize: "cover",
-                        backgroundPosition: "center",
-                      }}
-                    />
-                    <div className="explorar-card-img-overlay" />
-
-                    {p.etiqueta && (
-                      <span
-                        className={`etiqueta${
-                          p.etiqueta === "Exclusivo" ? " exclusivo" : ""
-                        }${
-                          p.etiqueta.startsWith("Temporada") ? " temporada" : ""
-                        }`}
-                      >
-                        {p.etiqueta}
-                      </span>
-                    )}
-
-                    <div className="explorar-card-rating">
-                      <Estrella size={12} />
-                      {p.rating.toFixed(1)}
-                    </div>
-                  </div>
-
-                  <div className="explorar-card-body">
-                    <h3>{p.titulo}</h3>
-                    <p className="explorar-card-desc">{p.descripcion}</p>
-
-                    <div className="explorar-card-meta">
-                      <span>
-                        <Pin size={12} /> {p.lugar}
-                      </span>
-                      <span>
-                        <Personas size={12} /> {p.personas} pers.
-                      </span>
-                    </div>
-
-                    {p.tipo && <span className="explorar-card-tipo">{p.tipo}</span>}
-
-                    <div className="explorar-card-precio">
-                      <strong>{rd(p.precio)}</strong>
-                      {p.precioAntes > 0 && (
-                        <span className="explorar-card-antes">{rd(p.precioAntes)}</span>
-                      )}
-                      <span className="explorar-card-por">para {p.personas}</span>
-                    </div>
-                  </div>
-                </a>
+                  {z}
+                </button>
               ))}
             </div>
           )}
+
+          {/* Type pills */}
+          {tipos.length > 0 && (
+            <div className="exp-filter-group">
+              {tipos.map((t) => (
+                <button
+                  key={t}
+                  className={`exp-pill exp-pill-type${tipo === t ? " active" : ""}`}
+                  onClick={() => setTipo(tipo === t ? null : t)}
+                >
+                  {t}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Sort + clear */}
+          <div className="exp-filter-right">
+            <select
+              className="exp-sort"
+              value={sort}
+              onChange={(e) => setSort(e.target.value as Sort)}
+            >
+              <option value="recomendados">Recomendados</option>
+              <option value="precio-asc">Precio ↑</option>
+              <option value="precio-desc">Precio ↓</option>
+              <option value="rating">Rating</option>
+            </select>
+            {hasFilters && (
+              <button className="exp-clear" onClick={clearFilters}>Limpiar</button>
+            )}
+          </div>
         </div>
+      </div>
+
+      {/* Results */}
+      <main className="exp-results">
+        <div className="exp-results-info">
+          {filtered.length} resultado{filtered.length !== 1 ? "s" : ""}
+          {zona ? ` en ${zona}` : ""}
+          {tipo ? ` · ${tipo}` : ""}
+        </div>
+
+        {filtered.length === 0 ? (
+          <div className="exp-empty">
+            <p>No encontramos experiencias con esos filtros</p>
+            <button onClick={clearFilters}>Ver todas</button>
+          </div>
+        ) : (
+          <div className="exp-grid">
+            {filtered.map((p, i) => (
+              <a
+                key={p.id}
+                href={`/experiencia/${p.slug}`}
+                className="exp-card"
+                style={{ animationDelay: `${i * 60}ms` }}
+              >
+                <div className="exp-card-img">
+                  <div
+                    className="exp-card-bg"
+                    style={{ backgroundImage: `url(${p.imagen})` }}
+                  />
+                  <div className="exp-card-img-shade" />
+                  {p.etiqueta && (
+                    <span className={`exp-card-badge${p.etiqueta === "Exclusivo" ? " exclusive" : ""}${p.etiqueta.startsWith("Temporada") ? " season" : ""}`}>
+                      {p.etiqueta}
+                    </span>
+                  )}
+                  <span className="exp-card-rating">
+                    <Estrella size={11} /> {p.rating.toFixed(1)}
+                  </span>
+                </div>
+                <div className="exp-card-body">
+                  <h3>{p.titulo}</h3>
+                  <p className="exp-card-desc">{p.descripcion}</p>
+                  <div className="exp-card-meta">
+                    <span><Pin size={11} /> {p.lugar}</span>
+                    <span><Personas size={11} /> {p.personas} pers.</span>
+                  </div>
+                  {p.tipo && <span className="exp-card-type">{p.tipo}</span>}
+                  <div className="exp-card-price">
+                    <strong>{rd(p.precio)}</strong>
+                    {p.precioAntes > 0 && <span className="exp-card-old">{rd(p.precioAntes)}</span>}
+                    <span className="exp-card-for">para {p.personas}</span>
+                  </div>
+                </div>
+              </a>
+            ))}
+          </div>
+        )}
       </main>
 
-      {/* Footer minimal */}
-      <footer className="explorar-footer">
-        <div className="wrap">
-          <a href="/" className="explorar-footer-back">← Volver al inicio</a>
-          <span>© 2026 Yupii®</span>
-        </div>
+      {/* Footer */}
+      <footer className="exp-foot">
+        <a href="/">← Volver a Yupii</a>
+        <span>© 2026 Yupii®</span>
       </footer>
-    </>
+    </div>
   );
 }
