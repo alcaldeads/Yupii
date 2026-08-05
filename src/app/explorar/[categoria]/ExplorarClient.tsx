@@ -46,22 +46,74 @@ export default function ExplorarClient({ cat, productos, zonas, tipos, videoUrl,
   return (
     <div className="xpl">
 
-      {/* Hero */}
-      <section className="xpl-hero">
-        {videoUrl && (
-          <video className="xpl-hero-vid" autoPlay muted loop playsInline preload="auto">
-            <source src={videoUrl} type="video/mp4" />
-          </video>
-        )}
-        {!videoUrl && gradiente && <div className="xpl-hero-grad" style={{ background: gradiente }} />}
-        <div className="xpl-hero-shade" />
-        <div className="xpl-hero-inner">
-          <a href="/" className="xpl-back">← Yupii</a>
-          <h1>{cat.nombre}</h1>
-          <p className="xpl-hero-sub">{productos.length} opciones disponibles</p>
-          <a href="#tipo-selector" className="xpl-hero-btn">Explorar ↓</a>
-        </div>
-      </section>
+      {/* Hero — Cinematic for Gastronomía, standard for the rest */}
+      {cat.slug === "gastronomia" ? (
+        <section className="gastro-cinema">
+          {videoUrl ? (
+            <video className="gastro-cinema-bg" autoPlay muted loop playsInline preload="auto">
+              <source src={videoUrl} type="video/mp4" />
+            </video>
+          ) : (
+            <div className="gastro-cinema-bg" style={{ background: gradiente ?? "linear-gradient(135deg,#6E2C00,#D68910)" }} />
+          )}
+          <div className="gastro-cinema-shade" />
+          <div className="gastro-cinema-inner">
+            <div className="gastro-cinema-left">
+              <a href="/" className="xpl-back">← Yupii</a>
+              <p className="gastro-cinema-tag">Gastronomía · República Dominicana</p>
+              <h1 className="gastro-cinema-title">
+                Donde el sabor<br />se convierte en<br />recuerdo
+              </h1>
+              <p className="gastro-cinema-desc">
+                {productos.length} experiencias gastronómicas. Desde cenar en un cenote iluminado hasta el único Relais &amp; Châteaux del país.
+              </p>
+              <a href="#tipo-selector" className="gastro-cinema-cta">
+                Explorar experiencias ↓
+              </a>
+            </div>
+            <div className="gastro-cinema-cards">
+              {[...productos]
+                .sort((a, b) => b.rating - a.rating)
+                .slice(0, 4)
+                .map((p) => (
+                  <a key={p.id} href={`/experiencia/${p.slug}`} className="gastro-card">
+                    <div className="gastro-card-img">
+                      <img src={p.imagen} alt={p.titulo} loading="eager" />
+                    </div>
+                    <div className="gastro-card-info">
+                      <div className="gastro-card-name">{p.titulo}</div>
+                      <div className="gastro-card-loc">{p.lugar}</div>
+                      <div className="gastro-card-bottom">
+                        <span className="gastro-card-stars">★ {p.rating.toFixed(1)}</span>
+                        <span className="gastro-card-price">{rd(p.precio)}</span>
+                      </div>
+                    </div>
+                  </a>
+                ))}
+            </div>
+          </div>
+          <div className="gastro-cinema-scroll">
+            <span>Desplázate para explorar</span>
+            <div className="gastro-cinema-arrow">↓</div>
+          </div>
+        </section>
+      ) : (
+        <section className="xpl-hero">
+          {videoUrl && (
+            <video className="xpl-hero-vid" autoPlay muted loop playsInline preload="auto">
+              <source src={videoUrl} type="video/mp4" />
+            </video>
+          )}
+          {!videoUrl && gradiente && <div className="xpl-hero-grad" style={{ background: gradiente }} />}
+          <div className="xpl-hero-shade" />
+          <div className="xpl-hero-inner">
+            <a href="/" className="xpl-back">← Yupii</a>
+            <h1>{cat.nombre}</h1>
+            <p className="xpl-hero-sub">{productos.length} opciones disponibles</p>
+            <a href="#tipo-selector" className="xpl-hero-btn">Explorar ↓</a>
+          </div>
+        </section>
+      )}
 
       {/* Type selector */}
       <div className="xpl-type-selector" id="tipo-selector">
