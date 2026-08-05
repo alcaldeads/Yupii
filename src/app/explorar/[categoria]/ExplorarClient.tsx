@@ -23,6 +23,16 @@ export default function ExplorarClient({ cat, productos, zonas, tipos, videoUrl,
   const [zona, setZona] = useState<string | null>(null);
   const [tipo, setTipo] = useState<string | null>(null);
   const [sort, setSort] = useState<Sort>("recomendados");
+  const [hoveredCard, setHoveredCard] = useState<number | null>(null);
+
+  // Top-rated restaurants for the Gastronomía cinematic hero
+  const gastroCards = useMemo(() =>
+    cat.slug === "gastronomia"
+      ? [...productos].sort((a, b) => b.rating - a.rating).slice(0, 5)
+      : [],
+    [productos, cat.slug]
+  );
+  const activeCard = hoveredCard !== null ? (gastroCards[hoveredCard] ?? null) : null;
 
   const filtered = useMemo(() => {
     let result = [...productos];
@@ -49,53 +59,99 @@ export default function ExplorarClient({ cat, productos, zonas, tipos, videoUrl,
       {/* Hero — Cinematic for Gastronomía, standard for the rest */}
       {cat.slug === "gastronomia" ? (
         <section className="gastro-cinema">
+          {/* Base video — fades when a card is hovered */}
           {videoUrl ? (
-            <video className="gastro-cinema-bg" autoPlay muted loop playsInline preload="auto">
+            <video
+              className={`gastro-cinema-bg${hoveredCard !== null ? " faded" : ""}`}
+              autoPlay muted loop playsInline preload="auto"
+            >
               <source src={videoUrl} type="video/mp4" />
             </video>
           ) : (
-            <div className="gastro-cinema-bg" style={{ background: gradiente ?? "linear-gradient(135deg,#6E2C00,#D68910)" }} />
+            <div
+              className={`gastro-cinema-bg${hoveredCard !== null ? " faded" : ""}`}
+              style={{ background: gradiente ?? "linear-gradient(135deg,#6E2C00,#D68910)" }}
+            />
           )}
+
+          {/* Per-card background images — crossfade in on hover */}
+          {gastroCards.map((p, i) => (
+            <img
+              key={p.id}
+              src={p.imagen}
+              alt=""
+              aria-hidden="true"
+              className={`gastro-bg-swap${hoveredCard === i ? " active" : ""}`}
+            />
+          ))}
+
           <div className="gastro-cinema-shade" />
 
-          {/* Left text — bottom-left */}
+          {/* Left text panel */}
           <div className="gastro-cinema-left">
             <a href="/" className="xpl-back">← Yupii</a>
-            <p className="gastro-cinema-tag">Gastronomía · República Dominicana</p>
-            <h1 className="gastro-cinema-title">
-              Donde el sabor<br />se convierte<br />en recuerdo
-            </h1>
-            <p className="gastro-cinema-desc">
-              {productos.length} experiencias gastronómicas únicas en la RD.
-            </p>
-            <a href="#tipo-selector" className="gastro-cinema-cta">
-              Descubrir experiencias ↓
-            </a>
+            <div className="gastro-text-wrap">
+
+              {/* Default: general category message */}
+              <div className={`gastro-text-default${hoveredCard !== null ? " hidden" : ""}`}>
+                <p className="gastro-cinema-tag">Gastronomía · República Dominicana</p>
+                <h1 className="gastro-cinema-title">
+                  Donde el sabor<br />se convierte<br />en recuerdo
+                </h1>
+                <p className="gastro-cinema-desc">
+                  {productos.length} experiencias gastronómicas únicas en la RD.
+                </p>
+                <a href="#tipo-selector" className="gastro-cinema-cta">
+                  Descubrir experiencias ↓
+                </a>
+              </div>
+
+              {/* Detail: shows the hovered card's info */}
+              <div className={`gastro-text-detail${hoveredCard !== null ? " visible" : ""}`}>
+                {activeCard && (
+                  <>
+                    <p className="gastro-detail-loc">— {activeCard.lugar}</p>
+                    <h2 className="gastro-detail-name">{activeCard.titulo}</h2>
+                    <p className="gastro-detail-desc">{activeCard.descripcion}</p>
+                    <div className="gastro-detail-row">
+                      <span className="gastro-detail-stars">★ {activeCard.rating.toFixed(1)}</span>
+                      <span className="gastro-detail-price">{rd(activeCard.precio)}</span>
+                    </div>
+                    <a href={`/experiencia/${activeCard.slug}`} className="gastro-cinema-cta gastro-cta-detail">
+                      Reservar experiencia →
+                    </a>
+                  </>
+                )}
+              </div>
+            </div>
           </div>
 
-          {/* Portrait cards — horizontal row, bottom-right */}
+          {/* Portrait cards row */}
           <div className="gastro-cinema-cards">
-            {[...productos]
-              .sort((a, b) => b.rating - a.rating)
-              .slice(0, 5)
-              .map((p) => (
-                <a key={p.id} href={`/experiencia/${p.slug}`} className="gastro-card">
-                  <img src={p.imagen} alt={p.titulo} loading="eager" />
-                  <div className="gastro-card-overlay" />
-                  <div className="gastro-card-info">
-                    <div className="gastro-card-loc">{p.lugar}</div>
-                    <div className="gastro-card-name">{p.titulo}</div>
-                    <div className="gastro-card-meta">
-                      <span className="gastro-card-stars">★ {p.rating.toFixed(1)}</span>
-                      <span className="gastro-card-price">{rd(p.precio)}</span>
-                    </div>
+            {gastroCards.map((p, i) => (
+              <a
+                key={p.id}
+                href={`/experiencia/${p.slug}`}
+                className={`gastro-card${hoveredCard === i ? " active" : ""}${hoveredCard !== null && hoveredCard !== i ? " dimmed" : ""}`}
+                onMouseEnter={() => setHoveredCard(i)}
+                onMouseLeave={() => setHoveredCard(null)}
+              >
+                <img src={p.imagen} alt={p.titulo} loading="eager" />
+                <div className="gastro-card-overlay" />
+                <div className="gastro-card-info">
+                  <div className="gastro-card-loc">{p.lugar}</div>
+                  <div className="gastro-card-name">{p.titulo}</div>
+                  <div className="gastro-card-meta">
+                    <span className="gastro-card-stars">★ {p.rating.toFixed(1)}</span>
+                    <span className="gastro-card-price">{rd(p.precio)}</span>
                   </div>
-                </a>
-              ))}
+                </div>
+              </a>
+            ))}
           </div>
 
           <div className="gastro-cinema-scroll">
-            <span>Desplázate para explorar</span>
+            <span>Pasa el cursor por las experiencias</span>
             <div className="gastro-cinema-arrow">↓</div>
           </div>
         </section>
