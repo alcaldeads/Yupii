@@ -37,13 +37,10 @@ export default function ExplorarClient({ cat, productos, zonas, tipos, videoUrl,
   const clearFilters = () => { setZona(null); setTipo(null); setSort("recomendados"); };
   const hasFilters = zona || tipo || sort !== "recomendados";
 
-  // First card is hero size in bento
-  const heroCard = filtered[0];
-  const restCards = filtered.slice(1);
-
   return (
     <div className="xpl">
-      {/* Hero */}
+
+      {/* Hero — cinematic */}
       <section className="xpl-hero">
         {videoUrl && (
           <video className="xpl-hero-vid" autoPlay muted loop playsInline preload="auto">
@@ -55,12 +52,13 @@ export default function ExplorarClient({ cat, productos, zonas, tipos, videoUrl,
         <div className="xpl-hero-inner">
           <a href="/" className="xpl-back">← Yupii</a>
           <h1>{cat.nombre}</h1>
-          <p>{cat.descripcion}</p>
+          <p className="xpl-hero-sub">{productos.length} GiftBox{productos.length !== 1 ? "es" : ""} disponibles</p>
+          <a href="#giftboxes" className="xpl-hero-btn">Explorar GiftBoxes ↓</a>
         </div>
       </section>
 
       {/* Filter bar */}
-      <div className="xpl-bar">
+      <div className="xpl-bar" id="giftboxes">
         <div className="xpl-bar-in">
           <div className="xpl-pills">
             {zonas.length > 0 && zonas.map((z) => (
@@ -87,56 +85,45 @@ export default function ExplorarClient({ cat, productos, zonas, tipos, videoUrl,
         </div>
       </div>
 
-      {/* Content */}
+      {/* Grid */}
       <main className="xpl-main">
-        <p className="xpl-count">{filtered.length} experiencia{filtered.length !== 1 ? "s" : ""}{zona ? ` en ${zona}` : ""}{tipo ? ` · ${tipo}` : ""}</p>
+        <p className="xpl-count">
+          {filtered.length} GiftBox{filtered.length !== 1 ? "es" : ""} de {cat.nombre}
+          {zona ? ` · ${zona}` : ""}
+          {tipo ? ` · ${tipo}` : ""}
+        </p>
 
         {filtered.length === 0 ? (
           <div className="xpl-empty">
             <p>Sin resultados con esos filtros</p>
-            <button onClick={clearFilters}>Ver todas</button>
+            <button onClick={clearFilters}>Ver todos</button>
           </div>
         ) : (
-          <div className="xpl-bento">
-            {/* Hero card — double size */}
-            {heroCard && (
-              <a href={`/experiencia/${heroCard.slug}`} className="xpl-card xpl-card-hero">
-                <div className="xpl-card-img">
-                  <img src={heroCard.imagen} alt={heroCard.titulo} loading="eager" />
-                  <div className="xpl-card-over" />
-                  <div className="xpl-card-info">
-                    {heroCard.etiqueta && <span className={`xpl-badge${heroCard.etiqueta === "Exclusivo" ? " exc" : ""}`}>{heroCard.etiqueta}</span>}
-                    <div className="xpl-card-bottom-info">
-                      <h3>{heroCard.titulo}</h3>
-                      <p>{heroCard.historia || heroCard.descripcion}</p>
-                      <div className="xpl-card-row">
-                        <span className="xpl-rating"><Estrella size={13} /> {heroCard.rating.toFixed(1)}</span>
-                        <span className="xpl-loc"><Pin size={11} /> {heroCard.lugar}</span>
-                        <strong className="xpl-price">{rd(heroCard.precio)}</strong>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </a>
-            )}
-
-            {/* Rest of cards */}
-            {restCards.map((p, i) => (
-              <a key={p.id} href={`/experiencia/${p.slug}`} className={`xpl-card xpl-card-std${(i + 1) % 5 === 0 ? " xpl-card-wide" : ""}`}>
+          <div className="xpl-grid">
+            {filtered.map((p) => (
+              <a key={p.id} href={`/experiencia/${p.slug}`} className="xpl-card">
                 <div className="xpl-card-img">
                   <img src={p.imagen} alt={p.titulo} loading="lazy" />
-                  <div className="xpl-card-over" />
-                  <div className="xpl-card-info">
-                    {p.etiqueta && <span className={`xpl-badge${p.etiqueta === "Exclusivo" ? " exc" : ""}`}>{p.etiqueta}</span>}
-                    <div className="xpl-card-bottom-info">
-                      <h3>{p.titulo}</h3>
-                      <div className="xpl-card-row">
-                        <span className="xpl-rating"><Estrella size={11} /> {p.rating.toFixed(1)}</span>
-                        <span className="xpl-loc"><Pin size={10} /> {p.lugar}</span>
-                        <strong className="xpl-price">{rd(p.precio)}</strong>
-                        {p.precioAntes > 0 && <span className="xpl-old">{rd(p.precioAntes)}</span>}
-                      </div>
+                  {p.etiqueta && (
+                    <span className={`xpl-badge${p.etiqueta === "Exclusivo" ? " exc" : ""}`}>
+                      {p.etiqueta}
+                    </span>
+                  )}
+                </div>
+                <div className="xpl-card-body">
+                  <h3 className="xpl-card-title">{p.titulo}</h3>
+                  <div className="xpl-card-meta">
+                    <span className="xpl-rating"><Estrella size={11} /> {p.rating.toFixed(1)}</span>
+                    <span className="xpl-loc"><Pin size={10} /> {p.lugar}</span>
+                  </div>
+                  <div className="xpl-card-footer">
+                    <div className="xpl-card-precio">
+                      <strong>{rd(p.precio)}</strong>
+                      {p.precioAntes > 0 && <span className="xpl-old">{rd(p.precioAntes)}</span>}
                     </div>
+                    <span className="xpl-personas-tag">
+                      <Personas size={11} /> {p.personas} persona{p.personas > 1 ? "s" : ""}
+                    </span>
                   </div>
                 </div>
               </a>
