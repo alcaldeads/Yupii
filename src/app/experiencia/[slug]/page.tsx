@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { PRODUCTOS } from "@/data/productos";
+import { PRODUCTOS, CATEGORIAS } from "@/data/productos";
 import type { Metadata } from "next";
 import ExperienceClient from "./ExperienceClient";
 
@@ -43,7 +43,14 @@ export default async function ExperienciaPage({ params }: Props) {
     (p) => p.categoria === producto.categoria && p.id !== producto.id
   ).slice(0, 3);
 
+  const catInfo = CATEGORIAS.find((c) => c.cat === producto.categoria);
+
   return (
-    <ExperienceClient producto={producto} relacionadas={relacionadas} />
+    <ExperienceClient
+      producto={producto}
+      relacionadas={relacionadas}
+      catSlug={catInfo?.slug ?? ""}
+      catNombre={catInfo?.nombre ?? "Explorar"}
+    />
   );
 }

@@ -10,12 +10,14 @@ import ModalMensaje, { type Mensaje } from "@/components/ModalMensaje";
 type Props = {
   producto: Producto;
   relacionadas: Producto[];
+  catSlug: string;
+  catNombre: string;
 };
 
 const REVIEWS: { nombre: string; texto: string; estrellas: number; hace: string }[] = [
   {
     nombre: "Laura G.",
-    texto: "Fue una experiencia increible, todo muy bien organizado. Lo recomiendo al 100%.",
+    texto: "Fue una experiencia increíble, todo muy bien organizado. Lo recomiendo al 100%.",
     estrellas: 5,
     hace: "Hace 2 semanas",
   },
@@ -33,23 +35,7 @@ const REVIEWS: { nombre: string; texto: string; estrellas: number; hace: string 
   },
 ];
 
-function EstrellasVacias({ size = 14 }: { size?: number }) {
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      aria-hidden
-    >
-      <path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5-5.9-3.2-5.9 3.2 1.2-6.5L2.5 9.4l6.6-.9z" />
-    </svg>
-  );
-}
-
-export default function ExperienceClient({ producto: p, relacionadas }: Props) {
+export default function ExperienceClient({ producto: p, relacionadas, catSlug, catNombre }: Props) {
   const [modalProducto, setModalProducto] = useState<Producto | null>(null);
   const [mensaje, setMensaje] = useState<Mensaje>(null);
   const [galeriaAbierta, setGaleriaAbierta] = useState(false);
@@ -59,17 +45,20 @@ export default function ExperienceClient({ producto: p, relacionadas }: Props) {
 
   return (
     <>
+      {/* Header */}
       <header className="exp-header">
-        <div className="wrap">
-          <a href="/" className="exp-back">
-            <Chevron dir="izq" size={16} /> Volver al catálogo
+        <div className="exp-header-in">
+          <a href={`/explorar/${catSlug}`} className="exp-back">
+            <Chevron dir="izq" size={14} />
+            {catNombre}
           </a>
         </div>
       </header>
 
       <main className="exp-page">
-        <div className="wrap">
-          {/* SECTION 1: Photo Gallery */}
+        <div className="exp-wrap">
+
+          {/* Gallery — full width */}
           <div className="exp-gallery">
             <button
               className="exp-gallery-main"
@@ -98,119 +87,152 @@ export default function ExperienceClient({ producto: p, relacionadas }: Props) {
             </button>
           </div>
 
-          {/* SECTION 2: Title + Key Info */}
-          <section className="exp-hero-info">
-            <h1 className="exp-titulo">{p.titulo}</h1>
-            <div className="exp-meta">
-              <span className="exp-meta-item">
-                <Pin size={14} /> {p.lugar}
-              </span>
-              <span className="exp-meta-item">
-                <Personas size={14} /> Para {p.personas} persona{p.personas > 1 ? "s" : ""}
-              </span>
-              <span className="exp-meta-item exp-meta-rating">
-                <Estrella size={14} /> {p.rating.toFixed(1)}
-                <span className="exp-meta-count">(38 opiniones)</span>
-              </span>
-            </div>
-            <p className="exp-descripcion">{p.descripcion}</p>
-          </section>
+          {/* 2-column layout */}
+          <div className="exp-layout">
 
-          {/* SECTION 3: Storytelling */}
-          <section className="exp-historia">
-            <p>{p.historia}</p>
-          </section>
+            {/* LEFT: content */}
+            <div className="exp-content">
 
-          {/* SECTION 4: What's Included */}
-          <section className="exp-incluye">
-            <h2>Qué incluye</h2>
-            <ul>
-              {p.incluye.map((item) => (
-                <li key={item}>
-                  <span className="exp-check">&#10003;</span>
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </section>
-
-          {/* SECTION 5: Available Partners */}
-          <section className="exp-aliados">
-            <h2>Aliados disponibles</h2>
-            <div className="exp-aliados-grid">
-              {p.aliados.map(([nombre, horario]) => (
-                <div key={nombre} className="exp-aliado-card">
-                  <strong>{nombre}</strong>
-                  <span>{horario}</span>
+              {/* Title + meta */}
+              <section className="exp-hero-info">
+                {p.etiqueta && <span className="exp-etiqueta">{p.etiqueta}</span>}
+                <h1 className="exp-titulo">{p.titulo}</h1>
+                <div className="exp-meta">
+                  <span className="exp-meta-item">
+                    <Pin size={14} /> {p.lugar}
+                  </span>
+                  <span className="exp-meta-item">
+                    <Personas size={14} /> Para {p.personas} persona{p.personas > 1 ? "s" : ""}
+                  </span>
+                  <span className="exp-meta-item exp-meta-rating">
+                    <Estrella size={14} /> {p.rating.toFixed(1)}
+                    <span className="exp-meta-count">(38 opiniones)</span>
+                  </span>
                 </div>
-              ))}
-            </div>
-          </section>
+                <p className="exp-descripcion">{p.descripcion}</p>
+              </section>
 
-          {/* SECTION 6: Reviews */}
-          <section className="exp-reviews">
-            <h2>Opiniones verificadas</h2>
-            <div className="exp-reviews-grid">
-              {REVIEWS.map((r) => (
-                <div key={r.nombre} className="exp-review-card">
-                  <div className="exp-review-stars">
-                    {Array.from({ length: 5 }).map((_, k) => (
-                      <span key={k} className={k < r.estrellas ? "star-filled" : "star-empty"}>
-                        {k < r.estrellas ? <Estrella size={14} /> : <EstrellasVacias size={14} />}
-                      </span>
-                    ))}
-                  </div>
-                  <p>&ldquo;{r.texto}&rdquo;</p>
-                  <div className="exp-review-autor">
-                    <strong>{r.nombre}</strong>
-                    <span>{r.hace}</span>
+              {/* Historia */}
+              <section className="exp-historia">
+                <p>{p.historia}</p>
+              </section>
+
+              {/* Qué incluye */}
+              <section className="exp-incluye">
+                <h2>Qué incluye</h2>
+                <ul>
+                  {p.incluye.map((item) => (
+                    <li key={item}>
+                      <span className="exp-check">✓</span>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </section>
+
+              {/* Aliados */}
+              <section className="exp-aliados">
+                <h2>Dónde canjear</h2>
+                <div className="exp-aliados-grid">
+                  {p.aliados.map(([nombre, horario]) => (
+                    <div key={nombre} className="exp-aliado-card">
+                      <strong>{nombre}</strong>
+                      <span>{horario}</span>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              {/* Reviews */}
+              <section className="exp-reviews">
+                <div className="exp-reviews-header">
+                  <h2>Opiniones</h2>
+                  <div className="exp-reviews-score">
+                    <Estrella size={18} />
+                    <strong>{p.rating.toFixed(1)}</strong>
+                    <span>· 38 opiniones</span>
                   </div>
                 </div>
-              ))}
-            </div>
-          </section>
+                <div className="exp-reviews-grid">
+                  {REVIEWS.map((r) => (
+                    <div key={r.nombre} className="exp-review-card">
+                      <div className="exp-review-stars">
+                        {Array.from({ length: 5 }).map((_, k) => (
+                          <span key={k} style={{ color: k < r.estrellas ? "var(--amarillo)" : "#ddd", display: "flex" }}>
+                            <Estrella size={13} />
+                          </span>
+                        ))}
+                      </div>
+                      <p>&ldquo;{r.texto}&rdquo;</p>
+                      <div className="exp-review-autor">
+                        <strong>{r.nombre}</strong>
+                        <span>{r.hace}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
 
-          {/* SECTION 7: Price + CTAs */}
-          <section className="exp-precio-section">
-            <div className="exp-precio-box">
-              <div className="exp-precio-amount">
-                {rd(p.precio)}
-                {p.precioAntes > 0 && (
-                  <span className="exp-precio-antes">{rd(p.precioAntes)}</span>
-                )}
-              </div>
-              <div className="exp-precio-badges">
-                <span className="exp-badge">Valido por 12 meses</span>
-                <span className="exp-badge">Intercambiable</span>
-              </div>
-              <div className="exp-ctas">
-                <button
-                  className="btn-lleno exp-cta-btn"
-                  onClick={() => setModalProducto(p)}
-                >
-                  Regalar esta experiencia
-                </button>
-                <button
-                  className="btn-parami exp-cta-btn"
-                  onClick={() => setModalProducto(p)}
-                >
-                  La quiero para mi
-                </button>
-              </div>
             </div>
-          </section>
 
-          {/* SECTION 8: Related Experiences */}
+            {/* RIGHT: sticky price card */}
+            <aside className="exp-sidebar">
+              <div className="exp-precio-card">
+
+                {/* Price */}
+                <div className="exp-pc-precio">
+                  <span className="exp-pc-amount">{rd(p.precio)}</span>
+                  {p.precioAntes > 0 && (
+                    <span className="exp-pc-antes">{rd(p.precioAntes)}</span>
+                  )}
+                </div>
+
+                {/* Rating mini */}
+                <div className="exp-pc-rating">
+                  <Estrella size={13} />
+                  <strong>{p.rating.toFixed(1)}</strong>
+                  <span>· 38 opiniones</span>
+                </div>
+
+                <hr className="exp-pc-divider" />
+
+                {/* Badges */}
+                <div className="exp-pc-badges">
+                  <span className="exp-pc-badge">✓ Válido 12 meses</span>
+                  <span className="exp-pc-badge">✓ Intercambiable</span>
+                  <span className="exp-pc-badge">✓ Cancelación flexible</span>
+                </div>
+
+                {/* CTAs */}
+                <div className="exp-pc-ctas">
+                  <button
+                    className="btn-lleno exp-pc-btn"
+                    onClick={() => setModalProducto(p)}
+                  >
+                    Regalar esta experiencia
+                  </button>
+                  <button
+                    className="btn-parami exp-pc-btn"
+                    onClick={() => setModalProducto(p)}
+                  >
+                    La quiero para mí
+                  </button>
+                </div>
+
+                {/* Trust */}
+                <p className="exp-pc-trust">Pago seguro · Entrega inmediata por email</p>
+              </div>
+            </aside>
+
+          </div>
+
+          {/* Relacionadas — full width */}
           {relacionadas.length > 0 && (
             <section className="exp-relacionadas">
               <h2>Experiencias similares</h2>
               <div className="exp-relacionadas-grid">
                 {relacionadas.map((r) => (
-                  <a
-                    key={r.id}
-                    href={`/experiencia/${r.slug}`}
-                    className="exp-rel-card"
-                  >
+                  <a key={r.id} href={`/experiencia/${r.slug}`} className="exp-rel-card">
                     <div className="exp-rel-foto">
                       <img src={r.imagen} alt={r.titulo} loading="lazy" />
                     </div>
@@ -227,68 +249,53 @@ export default function ExperienceClient({ producto: p, relacionadas }: Props) {
               </div>
             </section>
           )}
-        </div>
 
-        {/* Sticky mobile price bar */}
-        <div className="exp-sticky-bar">
-          <div className="exp-sticky-precio">
-            <strong>{rd(p.precio)}</strong>
-            {p.precioAntes > 0 && (
-              <span className="exp-sticky-antes">{rd(p.precioAntes)}</span>
-            )}
-          </div>
-          <button
-            className="btn-lleno exp-sticky-btn"
-            onClick={() => setModalProducto(p)}
-          >
-            Regalar
-          </button>
         </div>
       </main>
 
-      {/* Gallery Modal */}
+      {/* Mobile sticky bar */}
+      <div className="exp-sticky-bar">
+        <div className="exp-sticky-precio">
+          <strong>{rd(p.precio)}</strong>
+          {p.precioAntes > 0 && (
+            <span className="exp-sticky-antes">{rd(p.precioAntes)}</span>
+          )}
+        </div>
+        <button className="btn-lleno exp-sticky-btn" onClick={() => setModalProducto(p)}>
+          Regalar
+        </button>
+      </div>
+
+      {/* Gallery modal */}
       {galeriaAbierta && (
         <div
           className="exp-gallery-modal"
           role="dialog"
           aria-modal="true"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) setGaleriaAbierta(false);
-          }}
+          onClick={(e) => { if (e.target === e.currentTarget) setGaleriaAbierta(false); }}
         >
-          <button
-            className="exp-gm-close"
-            onClick={() => setGaleriaAbierta(false)}
-            aria-label="Cerrar galeria"
-          >
-            &#10005;
+          <button className="exp-gm-close" onClick={() => setGaleriaAbierta(false)} aria-label="Cerrar galería">
+            ✕
           </button>
           <button
             className="exp-gm-nav exp-gm-prev"
             onClick={() => setGaleriaIdx((i) => (i - 1 + todasFotos.length) % todasFotos.length)}
             aria-label="Foto anterior"
           >
-            <Chevron dir="izq" size={24} />
+            <Chevron dir="izq" size={22} />
           </button>
-          <img
-            src={todasFotos[galeriaIdx]}
-            alt={`${p.titulo} - foto ${galeriaIdx + 1}`}
-            className="exp-gm-img"
-          />
+          <img src={todasFotos[galeriaIdx]} alt={`${p.titulo} - foto ${galeriaIdx + 1}`} className="exp-gm-img" />
           <button
             className="exp-gm-nav exp-gm-next"
             onClick={() => setGaleriaIdx((i) => (i + 1) % todasFotos.length)}
             aria-label="Foto siguiente"
           >
-            <Chevron dir="der" size={24} />
+            <Chevron dir="der" size={22} />
           </button>
-          <div className="exp-gm-counter">
-            {galeriaIdx + 1} / {todasFotos.length}
-          </div>
+          <div className="exp-gm-counter">{galeriaIdx + 1} / {todasFotos.length}</div>
         </div>
       )}
 
-      {/* Purchase Modal */}
       <ModalProducto
         producto={modalProducto}
         onCerrar={() => setModalProducto(null)}
