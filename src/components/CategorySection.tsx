@@ -1,0 +1,146 @@
+"use client";
+
+import { useRef } from "react";
+import type { CatSection } from "@/data/productos";
+import type { Producto } from "@/data/productos";
+import { CATEGORIAS } from "@/data/productos";
+import { rd } from "@/lib/format";
+import { Chevron, Estrella, Pin, Personas } from "./Icons";
+
+type Props = {
+  section: CatSection;
+  productos: Producto[];
+  onAbrir: (p: Producto) => void;
+};
+
+export default function CategorySection({ section, productos, onAbrir }: Props) {
+  const riel = useRef<HTMLDivElement>(null);
+
+  const desplazar = (n: number) =>
+    riel.current?.scrollBy({ left: n * 300, behavior: "smooth" });
+
+  if (!productos.length) return null;
+
+  return (
+    <section className="cat-section" id={section.id}>
+      {/* Video de fondo */}
+      {section.videoUrl && (
+        <video
+          className="cat-section-video-bg"
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          aria-hidden="true"
+        >
+          <source src={section.videoUrl} type="video/mp4" />
+        </video>
+      )}
+
+      {/* Gradient fallback (behind video) */}
+      <div className="cat-section-gradient" style={{ background: section.gradiente }} />
+
+      {/* Overlay oscuro */}
+      <div className="cat-section-overlay" />
+
+      {/* Contenido encima */}
+      <div className="cat-section-content">
+        <div className="wrap">
+          <div className="cat-section-header">
+            <h2 className="cat-section-title">{section.titulo}</h2>
+            {(() => {
+              const catInfo = CATEGORIAS.find((c) => c.cat === section.categoria);
+              return catInfo ? (
+                <a href={`/explorar/${catInfo.slug}`} className="cat-section-ver-todo">
+                  Ver todo el catálogo →
+                </a>
+              ) : null;
+            })()}
+          </div>
+
+          <div className="cat-section-riel-wrap">
+            <button
+              className="cat-riel-flecha izq"
+              onClick={() => desplazar(-1)}
+              aria-label="Anterior"
+            >
+              <Chevron dir="izq" size={17} />
+            </button>
+
+            <div className="cat-section-riel" ref={riel}>
+              {productos.map((p) => (
+                <a
+                  key={p.id}
+                  className="glass-card"
+                  href={`/experiencia/${p.slug}`}
+                >
+                  <div className="glass-card-foto">
+                    <div
+                      className="glass-card-fondo"
+                      style={{
+                        backgroundImage: `url(${p.imagen})`,
+                        backgroundSize: "cover",
+                        backgroundPosition: "center",
+                      }}
+                    />
+                    <div className="glass-card-foto-overlay" />
+                    {p.etiqueta && (
+                      <span
+                        className={`glass-card-etiqueta${
+                          p.etiqueta === "Temporada Ene-Mar"
+                            ? " temporada"
+                            : p.etiqueta === "Exclusivo"
+                            ? " exclusivo"
+                            : ""
+                        }`}
+                      >
+                        {p.etiqueta}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="glass-card-body">
+                    <div className="glass-card-top">
+                      <h3>{p.titulo}</h3>
+                      <span className="glass-card-rating">
+                        <Estrella size={12} />
+                        {p.rating.toFixed(1)}
+                      </span>
+                    </div>
+
+                    <div className="glass-card-meta">
+                      <span>
+                        <Pin size={11} />
+                        {p.lugar}
+                      </span>
+                      <span>
+                        <Personas size={11} />
+                        {p.personas} pers.
+                      </span>
+                    </div>
+
+                    <div className="glass-card-precio">
+                      {rd(p.precio)}
+                      {p.precioAntes > 0 && (
+                        <span className="glass-card-antes">{rd(p.precioAntes)}</span>
+                      )}
+                    </div>
+                  </div>
+                </a>
+              ))}
+            </div>
+
+            <button
+              className="cat-riel-flecha der"
+              onClick={() => desplazar(1)}
+              aria-label="Siguiente"
+            >
+              <Chevron dir="der" size={17} />
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
