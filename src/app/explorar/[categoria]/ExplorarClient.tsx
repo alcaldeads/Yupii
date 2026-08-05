@@ -57,41 +57,43 @@ export default function ExplorarClient({ cat, productos, zonas, tipos, videoUrl,
             <div className="gastro-cinema-bg" style={{ background: gradiente ?? "linear-gradient(135deg,#6E2C00,#D68910)" }} />
           )}
           <div className="gastro-cinema-shade" />
-          <div className="gastro-cinema-inner">
-            <div className="gastro-cinema-left">
-              <a href="/" className="xpl-back">← Yupii</a>
-              <p className="gastro-cinema-tag">Gastronomía · República Dominicana</p>
-              <h1 className="gastro-cinema-title">
-                Donde el sabor<br />se convierte en<br />recuerdo
-              </h1>
-              <p className="gastro-cinema-desc">
-                {productos.length} experiencias gastronómicas. Desde cenar en un cenote iluminado hasta el único Relais &amp; Châteaux del país.
-              </p>
-              <a href="#tipo-selector" className="gastro-cinema-cta">
-                Explorar experiencias ↓
-              </a>
-            </div>
-            <div className="gastro-cinema-cards">
-              {[...productos]
-                .sort((a, b) => b.rating - a.rating)
-                .slice(0, 4)
-                .map((p) => (
-                  <a key={p.id} href={`/experiencia/${p.slug}`} className="gastro-card">
-                    <div className="gastro-card-img">
-                      <img src={p.imagen} alt={p.titulo} loading="eager" />
-                    </div>
-                    <div className="gastro-card-info">
-                      <div className="gastro-card-name">{p.titulo}</div>
-                      <div className="gastro-card-loc">{p.lugar}</div>
-                      <div className="gastro-card-bottom">
-                        <span className="gastro-card-stars">★ {p.rating.toFixed(1)}</span>
-                        <span className="gastro-card-price">{rd(p.precio)}</span>
-                      </div>
-                    </div>
-                  </a>
-                ))}
-            </div>
+
+          {/* Left text — bottom-left */}
+          <div className="gastro-cinema-left">
+            <a href="/" className="xpl-back">← Yupii</a>
+            <p className="gastro-cinema-tag">Gastronomía · República Dominicana</p>
+            <h1 className="gastro-cinema-title">
+              Donde el sabor<br />se convierte<br />en recuerdo
+            </h1>
+            <p className="gastro-cinema-desc">
+              {productos.length} experiencias gastronómicas únicas en la RD.
+            </p>
+            <a href="#tipo-selector" className="gastro-cinema-cta">
+              Descubrir experiencias ↓
+            </a>
           </div>
+
+          {/* Portrait cards — horizontal row, bottom-right */}
+          <div className="gastro-cinema-cards">
+            {[...productos]
+              .sort((a, b) => b.rating - a.rating)
+              .slice(0, 5)
+              .map((p) => (
+                <a key={p.id} href={`/experiencia/${p.slug}`} className="gastro-card">
+                  <img src={p.imagen} alt={p.titulo} loading="eager" />
+                  <div className="gastro-card-overlay" />
+                  <div className="gastro-card-info">
+                    <div className="gastro-card-loc">{p.lugar}</div>
+                    <div className="gastro-card-name">{p.titulo}</div>
+                    <div className="gastro-card-meta">
+                      <span className="gastro-card-stars">★ {p.rating.toFixed(1)}</span>
+                      <span className="gastro-card-price">{rd(p.precio)}</span>
+                    </div>
+                  </div>
+                </a>
+              ))}
+          </div>
+
           <div className="gastro-cinema-scroll">
             <span>Desplázate para explorar</span>
             <div className="gastro-cinema-arrow">↓</div>
