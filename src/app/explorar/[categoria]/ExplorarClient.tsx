@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import type { Producto } from "@/data/productos";
 import { rd } from "@/lib/format";
 import { Estrella, Pin, Personas } from "@/components/Icons";
@@ -23,7 +23,8 @@ export default function ExplorarClient({ cat, productos, zonas, tipos, videoUrl,
   const [zona, setZona] = useState<string | null>(null);
   const [tipo, setTipo] = useState<string | null>(null);
   const [sort, setSort] = useState<Sort>("recomendados");
-  const [hoveredCard, setHoveredCard] = useState<number | null>(null);
+  const [activeIdx, setActiveIdx] = useState<number | null>(null);
+  const [isHovering, setIsHovering] = useState(false);
 
   // Top-rated restaurants for the Gastronomía cinematic hero
   const gastroCards = useMemo(() =>
@@ -32,7 +33,25 @@ export default function ExplorarClient({ cat, productos, zonas, tipos, videoUrl,
       : [],
     [productos, cat.slug]
   );
-  const activeCard = hoveredCard !== null ? (gastroCards[hoveredCard] ?? null) : null;
+  const activeCard = activeIdx !== null ? (gastroCards[activeIdx] ?? null) : null;
+
+  // Start auto-rotation after entry animations finish (~2.8s)
+  useEffect(() => {
+    if (cat.slug !== "gastronomia" || gastroCards.length === 0) return;
+    const t = setTimeout(() => {
+      setActiveIdx(prev => prev === null ? 0 : prev);
+    }, 2800);
+    return () => clearTimeout(t);
+  }, [cat.slug, gastroCards.length]);
+
+  // Advance to next card every 4s (pauses while hovering a card)
+  useEffect(() => {
+    if (activeIdx === null || isHovering || gastroCards.length === 0) return;
+    const t = setTimeout(() => {
+      setActiveIdx(i => i !== null ? (i + 1) % gastroCards.length : 0);
+    }, 4000);
+    return () => clearTimeout(t);
+  }, [activeIdx, isHovering, gastroCards.length]);
 
   const filtered = useMemo(() => {
     let result = [...productos];
@@ -59,29 +78,29 @@ export default function ExplorarClient({ cat, productos, zonas, tipos, videoUrl,
       {/* Hero — Cinematic for Gastronomía, standard for the rest */}
       {cat.slug === "gastronomia" ? (
         <section className="gastro-cinema">
-          {/* Base video — fades when a card is hovered */}
+          {/* Base video — fades once auto-rotation starts */}
           {videoUrl ? (
             <video
-              className={`gastro-cinema-bg${hoveredCard !== null ? " faded" : ""}`}
+              className={`gastro-cinema-bg${activeIdx !== null ? " faded" : ""}`}
               autoPlay muted loop playsInline preload="auto"
             >
               <source src={videoUrl} type="video/mp4" />
             </video>
           ) : (
             <div
-              className={`gastro-cinema-bg${hoveredCard !== null ? " faded" : ""}`}
+              className={`gastro-cinema-bg${activeIdx !== null ? " faded" : ""}`}
               style={{ background: gradiente ?? "linear-gradient(135deg,#6E2C00,#D68910)" }}
             />
           )}
 
-          {/* Per-card background images — crossfade in on hover */}
+          {/* Per-card background images — crossfade in when active */}
           {gastroCards.map((p, i) => (
             <img
               key={p.id}
               src={p.imagen}
               alt=""
               aria-hidden="true"
-              className={`gastro-bg-swap${hoveredCard === i ? " active" : ""}`}
+              className={`gastro-bg-swap${activeIdx === i ? " active" : ""}`}
             />
           ))}
 
@@ -92,8 +111,8 @@ export default function ExplorarClient({ cat, productos, zonas, tipos, videoUrl,
             <a href="/" className="xpl-back">← Yupii</a>
             <div className="gastro-text-wrap">
 
-              {/* Default: general category message */}
-              <div className={`gastro-text-default${hoveredCard !== null ? " hidden" : ""}`}>
+              {/* Intro text — visible before auto-rotation starts */}
+              <div className={`gastro-text-default${activeIdx !== null ? " hidden" : ""}`}>
                 <p className="gastro-cinema-tag">Gastronomía · República Dominicana</p>
                 <h1 className="gastro-cinema-title">
                   Donde el sabor<br />se convierte<br />en recuerdo
@@ -106,10 +125,10 @@ export default function ExplorarClient({ cat, productos, zonas, tipos, videoUrl,
                 </a>
               </div>
 
-              {/* Detail: shows the hovered card's info */}
-              <div className={`gastro-text-detail${hoveredCard !== null ? " visible" : ""}`}>
+              {/* Active card detail — re-animates on each card change via key */}
+              <div className={`gastro-text-detail${activeIdx !== null ? " visible" : ""}`}>
                 {activeCard && (
-                  <>
+                  <div key={activeIdx} className="gastro-detail-inner">
                     <p className="gastro-detail-loc">— {activeCard.lugar}</p>
                     <h2 className="gastro-detail-name">{activeCard.titulo}</h2>
                     <p className="gastro-detail-desc">{activeCard.descripcion}</p>
@@ -120,9 +139,23 @@ export default function ExplorarClient({ cat, productos, zonas, tipos, videoUrl,
                     <a href={`/experiencia/${activeCard.slug}`} className="gastro-cinema-cta gastro-cta-detail">
                       Reservar experiencia →
                     </a>
-                  </>
+                  </div>
                 )}
               </div>
+
+              {/* Progress dots */}
+              {activeIdx !== null && (
+                <div className="gastro-dots">
+                  {gastroCards.map((_, i) => (
+                    <button
+                      key={i}
+                      className={`gastro-dot${activeIdx === i ? " on" : ""}`}
+                      onClick={() => { setActiveIdx(i); setIsHovering(false); }}
+                      aria-label={`Ver experiencia ${i + 1}`}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
@@ -132,9 +165,9 @@ export default function ExplorarClient({ cat, productos, zonas, tipos, videoUrl,
               <a
                 key={p.id}
                 href={`/experiencia/${p.slug}`}
-                className={`gastro-card${hoveredCard === i ? " active" : ""}${hoveredCard !== null && hoveredCard !== i ? " dimmed" : ""}`}
-                onMouseEnter={() => setHoveredCard(i)}
-                onMouseLeave={() => setHoveredCard(null)}
+                className={`gastro-card${activeIdx === i ? " active" : ""}${activeIdx !== null && activeIdx !== i ? " dimmed" : ""}`}
+                onMouseEnter={() => { setIsHovering(true); setActiveIdx(i); }}
+                onMouseLeave={() => setIsHovering(false)}
               >
                 <img src={p.imagen} alt={p.titulo} loading="eager" />
                 <div className="gastro-card-overlay" />
@@ -151,7 +184,7 @@ export default function ExplorarClient({ cat, productos, zonas, tipos, videoUrl,
           </div>
 
           <div className="gastro-cinema-scroll">
-            <span>Pasa el cursor por las experiencias</span>
+            <span>Desplázate para explorar</span>
             <div className="gastro-cinema-arrow">↓</div>
           </div>
         </section>

@@ -2404,15 +2404,45 @@ video.cat-section-video-bg {
   position: absolute;
   top: 0; left: 0; right: 0;
   opacity: 0;
-  transform: translateY(14px);
-  transition: opacity 0.38s ease, transform 0.38s ease;
+  transition: opacity 0.38s ease;
   pointer-events: none;
 }
 .gastro-text-detail.visible {
   opacity: 1;
-  transform: translateY(0);
   pointer-events: auto;
 }
+
+/* Inner wrapper — re-animates via key on each card change */
+.gastro-detail-inner {
+  animation: gastro-detail-enter 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes gastro-detail-enter {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Progress dots */
+.gastro-dots {
+  display: flex;
+  gap: 8px;
+  margin-top: 24px;
+  animation: gastro-fade-up 0.5s ease forwards;
+}
+.gastro-dot {
+  width: 28px;
+  height: 3px;
+  border-radius: 2px;
+  background: rgba(255,255,255,0.28);
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.3s ease, width 0.35s ease;
+}
+.gastro-dot.on {
+  background: #fff;
+  width: 48px;
+}
+
 .gastro-detail-loc {
   font-size: 0.82rem;
   font-weight: 500;
