@@ -59,10 +59,10 @@ export default function Header({ carrito, onAbrirRegalo, onBuscar, onCarrito }: 
             Ofertas
           </a>
           <div className="iconos">
-            <button className="ic-btn" aria-label="Mi cuenta">
+            <a href="/login" className="ic-btn" aria-label="Mi cuenta">
               <Usuario />
               <span className="punto" />
-            </button>
+            </a>
             <button className="ic-btn" aria-label="Carrito" onClick={onCarrito}>
               <Carrito />
               <span className="carrito-n">{carrito}</span>
