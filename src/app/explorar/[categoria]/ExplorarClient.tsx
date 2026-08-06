@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import type { Producto } from "@/data/productos";
 import { rd } from "@/lib/format";
 import { Estrella, Pin, Personas } from "@/components/Icons";
@@ -8,6 +8,13 @@ import { Estrella, Pin, Personas } from "@/components/Icons";
 type CatInfo = { cat: string; nombre: string; slug: string; descripcion: string };
 type Sort = "recomendados" | "precio-asc" | "precio-desc" | "rating";
 type Mode = "giftboxes" | "experiencias";
+type Phase = "preview" | "expanding" | "fullscreen";
+
+type ExpanderState = {
+  top: number; left: number; width: number; height: number;
+  fullW: number; fullH: number;
+  expanded: boolean;
+};
 
 type Props = {
   cat: CatInfo;
@@ -24,8 +31,13 @@ export default function ExplorarClient({ cat, productos, zonas, tipos, videoUrl,
   const [tipo, setTipo] = useState<string | null>(null);
   const [sort, setSort] = useState<Sort>("recomendados");
 
-  // Gastronomía cinematic hero — active card expands in-place, background crossfades
+  // Gastronomía cinematic hero
+  const [phase, setPhase] = useState<Phase>("preview");
   const [activeIdx, setActiveIdx] = useState(0);
+  const [expander, setExpander] = useState<ExpanderState | null>(null);
+
+  const cardRefs = useRef<(HTMLAnchorElement | null)[]>([]);
+  const sectionRef = useRef<HTMLElement>(null);
 
   const gastroCards = useMemo(() =>
     cat.slug === "gastronomia"
@@ -35,14 +47,59 @@ export default function ExplorarClient({ cat, productos, zonas, tipos, videoUrl,
   );
   const activeCard = gastroCards[activeIdx] ?? null;
 
-  // Auto-advance every 5s
+  // Phase machine:
+  // preview (1600ms): all cards visible, active card 2× bigger
+  // expanding (750ms): active card flies to fullscreen, others visible in strip
+  // fullscreen (3000ms): active card fills hero, text visible, strip shows 4 remaining
+  // → advance activeIdx, back to preview
   useEffect(() => {
     if (cat.slug !== "gastronomia" || gastroCards.length === 0) return;
+    const dur: Record<Phase, number> = { preview: 1600, expanding: 750, fullscreen: 3000 };
+
     const t = setTimeout(() => {
-      setActiveIdx(i => (i + 1) % gastroCards.length);
-    }, 5000);
+      if (phase === "preview") {
+        // Capture the active card's exact position BEFORE changing phase
+        // (card still has .active class = expanded size at this moment)
+        const card = cardRefs.current[activeIdx];
+        const section = sectionRef.current;
+        if (card && section) {
+          const cr = card.getBoundingClientRect();
+          const sr = section.getBoundingClientRect();
+          setExpander({
+            top: cr.top - sr.top,
+            left: cr.left - sr.left,
+            width: cr.width,
+            height: cr.height,
+            fullW: sr.width,
+            fullH: sr.height,
+            expanded: false,
+          });
+        }
+        setPhase("expanding");
+      } else if (phase === "expanding") {
+        setPhase("fullscreen");
+      } else {
+        // fullscreen → next card preview
+        setExpander(null);
+        setActiveIdx(i => (i + 1) % gastroCards.length);
+        setPhase("preview");
+      }
+    }, dur[phase]);
+
     return () => clearTimeout(t);
-  }, [activeIdx, cat.slug, gastroCards.length]);
+  }, [phase, activeIdx, cat.slug, gastroCards.length]);
+
+  // After expander mounts at card position, trigger expansion on next paint
+  useEffect(() => {
+    if (!expander || expander.expanded) return;
+    const r1 = requestAnimationFrame(() => {
+      const r2 = requestAnimationFrame(() => {
+        setExpander(e => e ? { ...e, expanded: true } : null);
+      });
+      return () => cancelAnimationFrame(r2);
+    });
+    return () => cancelAnimationFrame(r1);
+  }, [expander]);
 
   const filtered = useMemo(() => {
     let result = [...productos];
@@ -63,13 +120,23 @@ export default function ExplorarClient({ cat, productos, zonas, tipos, videoUrl,
   const precioDesde = Math.min(...productos.map((p) => p.precio));
   const avgRating = productos.reduce((s, p) => s + p.rating, 0) / productos.length;
 
+  // Card classes per phase
+  const getCardClass = (i: number) => {
+    if (phase === "preview") {
+      if (i === activeIdx) return " active";
+      return " dimmed";
+    }
+    // expanding or fullscreen: active card is ghost (invisible), others normal
+    if (i === activeIdx) return " ghost";
+    return "";
+  };
+
   return (
     <div className="xpl">
 
-      {/* Hero — Cinematic for Gastronomía, standard for the rest */}
       {cat.slug === "gastronomia" ? (
-        <section className="gastro-cinema">
-          {/* Base gradient */}
+        <section className="gastro-cinema" ref={sectionRef}>
+          {/* Base background */}
           {videoUrl ? (
             <video className="gastro-cinema-bg" autoPlay muted loop playsInline preload="auto">
               <source src={videoUrl} type="video/mp4" />
@@ -78,7 +145,7 @@ export default function ExplorarClient({ cat, productos, zonas, tipos, videoUrl,
             <div className="gastro-cinema-bg" style={{ background: gradiente ?? "linear-gradient(135deg,#6E2C00,#D68910)" }} />
           )}
 
-          {/* Per-card background images — crossfade to active */}
+          {/* Per-card background crossfade */}
           {gastroCards.map((p, i) => (
             <img key={p.id} src={p.imagen} alt="" aria-hidden="true"
               className={`gastro-bg-swap${activeIdx === i ? " active" : ""}`} />
@@ -86,7 +153,24 @@ export default function ExplorarClient({ cat, productos, zonas, tipos, videoUrl,
 
           <div className="gastro-cinema-shade" />
 
-          {/* Left text — active card details */}
+          {/* ── THE EXPANDER ──────────────────────────────────────────────
+              Cloned at the active card's exact position, then transitions
+              to fill the entire hero. z-index sits above the card strip.
+          ─────────────────────────────────────────────────────────────── */}
+          {expander && (
+            <div
+              className={`gastro-expander${expander.expanded ? " expanded" : ""}`}
+              style={expander.expanded
+                ? { top: 0, left: 0, width: expander.fullW, height: expander.fullH, borderRadius: 0 }
+                : { top: expander.top, left: expander.left, width: expander.width, height: expander.height, borderRadius: 22 }
+              }
+            >
+              <img src={activeCard?.imagen} alt="" aria-hidden="true" />
+              <div className="gastro-expander-shade" />
+            </div>
+          )}
+
+          {/* Left text — always shows active card details */}
           <div className="gastro-cinema-left">
             <a href="/" className="xpl-back">← Yupii</a>
             <div className="gastro-text-wrap">
@@ -104,13 +188,11 @@ export default function ExplorarClient({ cat, productos, zonas, tipos, videoUrl,
                   </a>
                 </div>
               )}
-
-              {/* Progress dots */}
               <div className="gastro-dots">
                 {gastroCards.map((_, i) => (
                   <button key={i}
                     className={`gastro-dot${activeIdx === i ? " on" : ""}`}
-                    onClick={() => setActiveIdx(i)}
+                    onClick={() => { setExpander(null); setActiveIdx(i); setPhase("preview"); }}
                     aria-label={`Ver experiencia ${i + 1}`}
                   />
                 ))}
@@ -118,15 +200,23 @@ export default function ExplorarClient({ cat, productos, zonas, tipos, videoUrl,
             </div>
           </div>
 
-          {/* Cards strip — always visible, active card expands in-place */}
+          {/* Cards strip — active card becomes ghost while expander fills hero */}
           <div className="gastro-cinema-cards">
             {gastroCards.map((p, i) => (
               <a
                 key={p.id}
                 href={`/experiencia/${p.slug}`}
-                className={`gastro-card${activeIdx === i ? " active" : ""}`}
-                style={{ animationDelay: `${0.4 + i * 0.18}s` }}
-                onClick={(e) => { if (activeIdx !== i) { e.preventDefault(); setActiveIdx(i); } }}
+                ref={el => { cardRefs.current[i] = el; }}
+                className={`gastro-card${getCardClass(i)}`}
+                style={{ animationDelay: `${0.30 + i * 0.18}s` }}
+                onClick={(e) => {
+                  if (activeIdx !== i) {
+                    e.preventDefault();
+                    setExpander(null);
+                    setActiveIdx(i);
+                    setPhase("preview");
+                  }
+                }}
               >
                 <img src={p.imagen} alt={p.titulo} loading="eager" />
                 <div className="gastro-card-overlay" />
@@ -168,25 +258,13 @@ export default function ExplorarClient({ cat, productos, zonas, tipos, videoUrl,
       {/* Type selector */}
       <div className="xpl-type-selector" id="tipo-selector">
         <div className="xpl-type-inner">
-          <button
-            className={`xpl-type-btn${mode === "giftboxes" ? " active" : ""}`}
-            onClick={() => setMode("giftboxes")}
-          >
+          <button className={`xpl-type-btn${mode === "giftboxes" ? " active" : ""}`} onClick={() => setMode("giftboxes")}>
             <span className="xpl-type-icon">🎁</span>
-            <div className="xpl-type-text">
-              <strong>GiftBoxes</strong>
-              <span>El destinatario elige su experiencia</span>
-            </div>
+            <div className="xpl-type-text"><strong>GiftBoxes</strong><span>El destinatario elige su experiencia</span></div>
           </button>
-          <button
-            className={`xpl-type-btn${mode === "experiencias" ? " active" : ""}`}
-            onClick={() => setMode("experiencias")}
-          >
+          <button className={`xpl-type-btn${mode === "experiencias" ? " active" : ""}`} onClick={() => setMode("experiencias")}>
             <span className="xpl-type-icon">⚡</span>
-            <div className="xpl-type-text">
-              <strong>Experiencias</strong>
-              <span>Compra directa de una experiencia</span>
-            </div>
+            <div className="xpl-type-text"><strong>Experiencias</strong><span>Compra directa de una experiencia</span></div>
           </button>
         </div>
       </div>
@@ -199,9 +277,7 @@ export default function ExplorarClient({ cat, productos, zonas, tipos, videoUrl,
             <div className="xpl-giftbox-img">
               <img src={productos[0]?.imagen} alt={`GiftBox ${cat.nombre}`} />
               <div className="xpl-giftbox-overlay" />
-              <div className="xpl-giftbox-label">
-                <span>🎁</span> GiftBox
-              </div>
+              <div className="xpl-giftbox-label"><span>🎁</span> GiftBox</div>
             </div>
             <div className="xpl-giftbox-body">
               <div className="xpl-giftbox-tag">Más popular</div>
@@ -210,22 +286,11 @@ export default function ExplorarClient({ cat, productos, zonas, tipos, videoUrl,
                 Regala libertad. El destinatario recibe un código y elige su experiencia favorita
                 entre las {productos.length} opciones de {cat.nombre} disponibles en Yupii.
               </p>
-
               <div className="xpl-giftbox-stats">
-                <div className="xpl-giftbox-stat">
-                  <strong>{productos.length}</strong>
-                  <span>experiencias incluidas</span>
-                </div>
-                <div className="xpl-giftbox-stat">
-                  <strong>★ {avgRating.toFixed(1)}</strong>
-                  <span>rating promedio</span>
-                </div>
-                <div className="xpl-giftbox-stat">
-                  <strong>12 meses</strong>
-                  <span>validez del código</span>
-                </div>
+                <div className="xpl-giftbox-stat"><strong>{productos.length}</strong><span>experiencias incluidas</span></div>
+                <div className="xpl-giftbox-stat"><strong>★ {avgRating.toFixed(1)}</strong><span>rating promedio</span></div>
+                <div className="xpl-giftbox-stat"><strong>12 meses</strong><span>validez del código</span></div>
               </div>
-
               <div className="xpl-giftbox-includes">
                 <p className="xpl-giftbox-includes-title">Incluye experiencias como:</p>
                 <div className="xpl-giftbox-previews">
@@ -236,13 +301,10 @@ export default function ExplorarClient({ cat, productos, zonas, tipos, videoUrl,
                     </div>
                   ))}
                   {productos.length > 4 && (
-                    <div className="xpl-giftbox-preview xpl-giftbox-more">
-                      +{productos.length - 4} más
-                    </div>
+                    <div className="xpl-giftbox-preview xpl-giftbox-more">+{productos.length - 4} más</div>
                   )}
                 </div>
               </div>
-
               <div className="xpl-giftbox-cta">
                 <div className="xpl-giftbox-precio">
                   <span className="xpl-giftbox-desde">Desde</span>
@@ -250,7 +312,6 @@ export default function ExplorarClient({ cat, productos, zonas, tipos, videoUrl,
                 </div>
                 <button className="btn-lleno xpl-giftbox-btn">Regalar este GiftBox</button>
               </div>
-
               <p className="xpl-giftbox-trust">✓ Entrega inmediata · ✓ Código canjeable · ✓ Cancelación flexible</p>
             </div>
           </div>
@@ -267,12 +328,10 @@ export default function ExplorarClient({ cat, productos, zonas, tipos, videoUrl,
                   <button key={z} className={`xpl-pill${zona === z ? " on" : ""}`} onClick={() => setZona(zona === z ? null : z)}>{z}</button>
                 ))}
                 {tipos.length > 0 && (
-                  <>
-                    <span className="xpl-sep" />
-                    {tipos.map((t) => (
-                      <button key={t} className={`xpl-pill xpl-pill-t${tipo === t ? " on" : ""}`} onClick={() => setTipo(tipo === t ? null : t)}>{t}</button>
-                    ))}
-                  </>
+                  <><span className="xpl-sep" />
+                  {tipos.map((t) => (
+                    <button key={t} className={`xpl-pill xpl-pill-t${tipo === t ? " on" : ""}`} onClick={() => setTipo(tipo === t ? null : t)}>{t}</button>
+                  ))}</>
                 )}
               </div>
               <div className="xpl-bar-r">
@@ -286,28 +345,20 @@ export default function ExplorarClient({ cat, productos, zonas, tipos, videoUrl,
               </div>
             </div>
           </div>
-
           <main className="xpl-main">
             <p className="xpl-count">
               {filtered.length} experiencia{filtered.length !== 1 ? "s" : ""} de {cat.nombre}
               {zona ? ` · ${zona}` : ""}{tipo ? ` · ${tipo}` : ""}
             </p>
             {filtered.length === 0 ? (
-              <div className="xpl-empty">
-                <p>Sin resultados con esos filtros</p>
-                <button onClick={clearFilters}>Ver todas</button>
-              </div>
+              <div className="xpl-empty"><p>Sin resultados con esos filtros</p><button onClick={clearFilters}>Ver todas</button></div>
             ) : (
               <div className="xpl-grid">
                 {filtered.map((p) => (
                   <a key={p.id} href={`/experiencia/${p.slug}`} className="xpl-card">
                     <div className="xpl-card-img">
                       <img src={p.imagen} alt={p.titulo} loading="lazy" />
-                      {p.etiqueta && (
-                        <span className={`xpl-badge${p.etiqueta === "Exclusivo" ? " exc" : ""}`}>
-                          {p.etiqueta}
-                        </span>
-                      )}
+                      {p.etiqueta && <span className={`xpl-badge${p.etiqueta === "Exclusivo" ? " exc" : ""}`}>{p.etiqueta}</span>}
                     </div>
                     <div className="xpl-card-body">
                       <h3 className="xpl-card-title">{p.titulo}</h3>
@@ -320,9 +371,7 @@ export default function ExplorarClient({ cat, productos, zonas, tipos, videoUrl,
                           <strong>{rd(p.precio)}</strong>
                           {p.precioAntes > 0 && <span className="xpl-old">{rd(p.precioAntes)}</span>}
                         </div>
-                        <span className="xpl-personas-tag">
-                          <Personas size={11} /> {p.personas} persona{p.personas > 1 ? "s" : ""}
-                        </span>
+                        <span className="xpl-personas-tag"><Personas size={11} /> {p.personas} persona{p.personas > 1 ? "s" : ""}</span>
                       </div>
                     </div>
                   </a>

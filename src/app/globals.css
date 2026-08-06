@@ -2314,12 +2314,40 @@ video.cat-section-video-bg {
   to   { opacity: 1; transform: translateY(0); }
 }
 
+/* ── Expander overlay — FLIP animation from card to fullscreen ── */
+.gastro-expander {
+  position: absolute;
+  overflow: hidden;
+  z-index: 4;
+  pointer-events: none;
+  transition:
+    top    0.72s cubic-bezier(0.22, 1, 0.36, 1),
+    left   0.72s cubic-bezier(0.22, 1, 0.36, 1),
+    width  0.72s cubic-bezier(0.22, 1, 0.36, 1),
+    height 0.72s cubic-bezier(0.22, 1, 0.36, 1),
+    border-radius 0.72s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.gastro-expander > img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover; display: block;
+}
+.gastro-expander-shade {
+  position: absolute; inset: 0; z-index: 1;
+  background:
+    linear-gradient(to right, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.42) 40%, rgba(0,0,0,0.08) 100%),
+    linear-gradient(to top,   rgba(0,0,0,0.55) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity 0.55s ease 0.35s;
+}
+.gastro-expander.expanded .gastro-expander-shade { opacity: 1; }
+
 /* ── Left text panel ── */
 .gastro-cinema-left {
   position: absolute;
   left: 52px;
   bottom: 88px;
-  z-index: 3;
+  z-index: 6;
   width: 400px;
 }
 .gastro-cinema-left .xpl-back {
@@ -2377,7 +2405,7 @@ video.cat-section-video-bg {
   bottom: 48px;
   left: 38%;
   right: -32px;
-  z-index: 3;
+  z-index: 2;
   display: flex;
   flex-direction: row;
   gap: 12px;
@@ -2424,10 +2452,16 @@ video.cat-section-video-bg {
   z-index: 4;
 }
 
-/* Dim non-active cards while any card is active */
-.gastro-cinema-cards:has(.gastro-card.active) .gastro-card:not(.active) {
+/* Dim non-active cards */
+.gastro-card.dimmed {
   opacity: 0.52;
   transform: translateY(5px) scale(0.97);
+}
+/* Ghost: invisible while expander takes its place */
+.gastro-card.ghost {
+  opacity: 0 !important;
+  transition: none !important;
+  pointer-events: none;
 }
 
 /* Full-bleed photo */
