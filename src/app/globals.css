@@ -2314,12 +2314,48 @@ video.cat-section-video-bg {
   50%       { transform: translateY(7px); }
 }
 
-/* ── Left text panel ── bottom-left ────── */
+/* ── THE EXPANDER — card that physically grows to fill the hero ── */
+.gastro-expander {
+  position: absolute;
+  overflow: hidden;
+  z-index: 4;
+  /* Transition all geometry so the card smoothly grows to fullscreen */
+  transition:
+    top    0.72s cubic-bezier(0.22, 1, 0.36, 1),
+    left   0.72s cubic-bezier(0.22, 1, 0.36, 1),
+    width  0.72s cubic-bezier(0.22, 1, 0.36, 1),
+    height 0.72s cubic-bezier(0.22, 1, 0.36, 1),
+    border-radius 0.72s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.gastro-expander img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+/* Gradient that fades in as the card expands — makes left text readable */
+.gastro-expander-shade {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    linear-gradient(to right, rgba(0,0,0,0.80) 0%, rgba(0,0,0,0.45) 40%, rgba(0,0,0,0.10) 100%),
+    linear-gradient(to top,   rgba(0,0,0,0.50) 0%, transparent 55%);
+  opacity: 0;
+  transition: opacity 0.45s ease 0.25s; /* slight delay — shade appears mid-expansion */
+}
+.gastro-expander.expanded .gastro-expander-shade {
+  opacity: 1;
+}
+
+/* ── Left text panel — above the expander ── */
 .gastro-cinema-left {
   position: absolute;
   left: 52px;
   bottom: 88px;
-  z-index: 3;
+  z-index: 6;
   width: 400px;
 }
 .gastro-cinema-left .xpl-back {
@@ -2466,7 +2502,7 @@ video.cat-section-video-bg {
   bottom: 48px;
   left: 40%;
   right: -24px;
-  z-index: 3;
+  z-index: 2; /* below expander (z-index 4) so expander rises above it */
   display: flex;
   flex-direction: row;
   gap: 14px;
@@ -2597,12 +2633,18 @@ video.cat-section-video-bg {
   to   { transform: scale(1); }
 }
 
+/* Hide the active card in the strip while its expander clone is visible */
+.gastro-card.ghost {
+  opacity: 0;
+  pointer-events: none;
+}
+
 /* ── Scroll hint ──────────────────────── */
 .gastro-cinema-scroll {
   position: absolute;
   bottom: 20px;
   left: 52px;
-  z-index: 3;
+  z-index: 6;
   display: flex;
   align-items: center;
   gap: 10px;

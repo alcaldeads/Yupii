@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import type { Producto } from "@/data/productos";
 import { rd } from "@/lib/format";
 import { Estrella, Pin, Personas } from "@/components/Icons";
@@ -9,6 +9,12 @@ type CatInfo = { cat: string; nombre: string; slug: string; descripcion: string 
 type Sort = "recomendados" | "precio-asc" | "precio-desc" | "rating";
 type Mode = "giftboxes" | "experiencias";
 type Phase = "entering" | "cards" | "expanding" | "fullscreen";
+
+type ExpanderState = {
+  top: number; left: number; width: number; height: number;
+  fullW: number; fullH: number;
+  expanded: boolean;
+};
 
 type Props = {
   cat: CatInfo;
@@ -24,10 +30,15 @@ export default function ExplorarClient({ cat, productos, zonas, tipos, videoUrl,
   const [zona, setZona] = useState<string | null>(null);
   const [tipo, setTipo] = useState<string | null>(null);
   const [sort, setSort] = useState<Sort>("recomendados");
-  const [activeIdx, setActiveIdx] = useState(0);
-  const [phase, setPhase] = useState<Phase>("entering");
 
-  // Top-rated restaurants for the Gastronomía cinematic hero
+  // Gastronomía cinematic hero
+  const [phase, setPhase] = useState<Phase>("entering");
+  const [activeIdx, setActiveIdx] = useState(0);
+  const [expander, setExpander] = useState<ExpanderState | null>(null);
+
+  const cardRefs = useRef<(HTMLAnchorElement | null)[]>([]);
+  const sectionRef = useRef<HTMLElement>(null);
+
   const gastroCards = useMemo(() =>
     cat.slug === "gastronomia"
       ? [...productos].sort((a, b) => b.rating - a.rating).slice(0, 5)
@@ -36,26 +47,58 @@ export default function ExplorarClient({ cat, productos, zonas, tipos, videoUrl,
   );
   const activeCard = gastroCards[activeIdx] ?? null;
 
-  // Phase state machine: entering → cards → expanding → fullscreen → next card entering…
+  // When phase becomes "expanding": capture the card's exact screen position
+  // and create an expander element there (same size as the card)
+  useEffect(() => {
+    if (phase !== "expanding" || cat.slug !== "gastronomia") return;
+    const card = cardRefs.current[activeIdx];
+    const section = sectionRef.current;
+    if (!card || !section) return;
+    const cr = card.getBoundingClientRect();
+    const sr = section.getBoundingClientRect();
+    setExpander({
+      top: cr.top - sr.top,
+      left: cr.left - sr.left,
+      width: cr.width,
+      height: cr.height,
+      fullW: sr.width,
+      fullH: sr.height,
+      expanded: false,
+    });
+  }, [phase, activeIdx, cat.slug]);
+
+  // After expander is placed in DOM (at card's position), trigger expansion on next paint
+  useEffect(() => {
+    if (!expander || expander.expanded) return;
+    const raf1 = requestAnimationFrame(() => {
+      const raf2 = requestAnimationFrame(() => {
+        setExpander(e => e ? { ...e, expanded: true } : null);
+      });
+      return () => cancelAnimationFrame(raf2);
+    });
+    return () => cancelAnimationFrame(raf1);
+  }, [expander]);
+
+  // Phase machine timer
   useEffect(() => {
     if (cat.slug !== "gastronomia" || gastroCards.length === 0) return;
-    const durations: Record<Phase, number> = {
-      entering: 900,
-      cards: 2200,
-      expanding: 650,
-      fullscreen: 2800,
+    const dur: Record<Phase, number> = {
+      entering: 950,   // cards slide in from right
+      cards: 2000,     // cards visible, user sees them
+      expanding: 750,  // card expands to fullscreen
+      fullscreen: 3000,// fullscreen view of restaurant
     };
     const t = setTimeout(() => {
-      switch (phase) {
-        case "entering":   setPhase("cards"); break;
-        case "cards":      setPhase("expanding"); break;
-        case "expanding":  setPhase("fullscreen"); break;
-        case "fullscreen":
-          setActiveIdx(i => (i + 1) % gastroCards.length);
-          setPhase("entering");
-          break;
+      if (phase === "fullscreen") {
+        // Remove expander, advance to next card, restart cycle
+        setExpander(null);
+        setActiveIdx(i => (i + 1) % gastroCards.length);
+        setPhase("entering");
+      } else {
+        const next: Record<Phase, Phase> = { entering: "cards", cards: "expanding", expanding: "fullscreen", fullscreen: "entering" };
+        setPhase(next[phase]);
       }
-    }, durations[phase]);
+    }, dur[phase]);
     return () => clearTimeout(t);
   }, [phase, cat.slug, gastroCards.length]);
 
@@ -78,41 +121,52 @@ export default function ExplorarClient({ cat, productos, zonas, tipos, videoUrl,
   const precioDesde = Math.min(...productos.map((p) => p.precio));
   const avgRating = productos.reduce((s, p) => s + p.rating, 0) / productos.length;
 
+  // Cards strip visibility
+  const cardsHidden = phase === "expanding" || phase === "fullscreen";
+  const cardsEntering = phase === "entering";
+
   return (
     <div className="xpl">
 
       {/* Hero — Cinematic for Gastronomía, standard for the rest */}
       {cat.slug === "gastronomia" ? (
-        <section className={`gastro-cinema${phase === "fullscreen" ? " phase-fullscreen" : ""}`}>
-          {/* Base video / gradient background — always visible */}
+        <section className="gastro-cinema" ref={sectionRef}>
+          {/* Base gradient (always underneath) */}
           {videoUrl ? (
-            <video
-              className="gastro-cinema-bg"
-              autoPlay muted loop playsInline preload="auto"
-            >
+            <video className="gastro-cinema-bg" autoPlay muted loop playsInline preload="auto">
               <source src={videoUrl} type="video/mp4" />
             </video>
           ) : (
-            <div
-              className="gastro-cinema-bg"
-              style={{ background: gradiente ?? "linear-gradient(135deg,#6E2C00,#D68910)" }}
-            />
+            <div className="gastro-cinema-bg" style={{ background: gradiente ?? "linear-gradient(135deg,#6E2C00,#D68910)" }} />
           )}
 
-          {/* Per-card background images — crossfade in when active */}
+          {/* Per-card background images — always crossfaded to active idx */}
           {gastroCards.map((p, i) => (
-            <img
-              key={p.id}
-              src={p.imagen}
-              alt=""
-              aria-hidden="true"
-              className={`gastro-bg-swap${activeIdx === i ? " active" : ""}`}
-            />
+            <img key={p.id} src={p.imagen} alt="" aria-hidden="true"
+              className={`gastro-bg-swap${activeIdx === i ? " active" : ""}`} />
           ))}
 
           <div className="gastro-cinema-shade" />
 
-          {/* Left text panel — always shows active card detail */}
+          {/* ── THE EXPANDER ────────────────────────────────────────────
+              Starts at the exact position/size of the active card,
+              then transitions to fill the full section.
+              Sits above the card strip so it "breaks out" of it.
+          ─────────────────────────────────────────────────────────── */}
+          {expander && (
+            <div
+              className={`gastro-expander${expander.expanded ? " expanded" : ""}`}
+              style={expander.expanded
+                ? { top: 0, left: 0, width: expander.fullW, height: expander.fullH, borderRadius: 0 }
+                : { top: expander.top, left: expander.left, width: expander.width, height: expander.height, borderRadius: 18 }
+              }
+            >
+              <img src={activeCard?.imagen} alt="" aria-hidden="true" />
+              <div className="gastro-expander-shade" />
+            </div>
+          )}
+
+          {/* Left text panel */}
           <div className="gastro-cinema-left">
             <a href="/" className="xpl-back">← Yupii</a>
             <div className="gastro-text-wrap">
@@ -130,14 +184,11 @@ export default function ExplorarClient({ cat, productos, zonas, tipos, videoUrl,
                   </a>
                 </div>
               )}
-
-              {/* Progress dots */}
               <div className="gastro-dots">
                 {gastroCards.map((_, i) => (
-                  <button
-                    key={i}
+                  <button key={i}
                     className={`gastro-dot${activeIdx === i ? " on" : ""}`}
-                    onClick={() => { setActiveIdx(i); setPhase("cards"); }}
+                    onClick={() => { setExpander(null); setActiveIdx(i); setPhase("cards"); }}
                     aria-label={`Ver experiencia ${i + 1}`}
                   />
                 ))}
@@ -145,13 +196,17 @@ export default function ExplorarClient({ cat, productos, zonas, tipos, videoUrl,
             </div>
           </div>
 
-          {/* Portrait cards row — slides in/out based on phase */}
-          <div className={`gastro-cinema-cards${phase === "expanding" || phase === "fullscreen" ? " offscreen" : ""}${phase === "entering" ? " entering" : ""}`}>
+          {/* Portrait cards strip — slides in from right on "entering", out on "expanding"/"fullscreen" */}
+          <div className={`gastro-cinema-cards${cardsHidden ? " offscreen" : ""}${cardsEntering ? " entering" : ""}`}>
             {gastroCards.map((p, i) => (
               <a
                 key={p.id}
                 href={`/experiencia/${p.slug}`}
-                className={`gastro-card${activeIdx === i && phase === "cards" ? " active" : ""}`}
+                ref={el => { cardRefs.current[i] = el; }}
+                className={`gastro-card${activeIdx === i && phase === "cards" ? " active" : ""}${expander && activeIdx === i ? " ghost" : ""}`}
+                onClick={(e) => {
+                  if (activeIdx !== i) { e.preventDefault(); setExpander(null); setActiveIdx(i); setPhase("cards"); }
+                }}
               >
                 <img src={p.imagen} alt={p.titulo} loading="eager" />
                 <div className="gastro-card-overlay" />
