@@ -2452,17 +2452,8 @@ video.cat-section-video-bg {
   z-index: 4;
 }
 
-/* Dim non-active cards */
-.gastro-card.dimmed {
-  opacity: 0.52;
-  transform: translateY(5px) scale(0.97);
-}
-/* Ghost: invisible while expander takes its place */
-.gastro-card.ghost {
-  opacity: 0 !important;
-  transition: none !important;
-  pointer-events: none;
-}
+/* Non-active cards — fully visible, normal size */
+/* (no dimming, no hiding — always visible in the strip) */
 
 /* Full-bleed photo */
 .gastro-card > img {
