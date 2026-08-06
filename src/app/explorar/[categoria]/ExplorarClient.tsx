@@ -8,6 +8,7 @@ import { Estrella, Pin, Personas } from "@/components/Icons";
 type CatInfo = { cat: string; nombre: string; slug: string; descripcion: string };
 type Sort = "recomendados" | "precio-asc" | "precio-desc" | "rating";
 type Mode = "giftboxes" | "experiencias";
+type Phase = "entering" | "cards" | "expanding" | "fullscreen";
 
 type Props = {
   cat: CatInfo;
@@ -23,8 +24,8 @@ export default function ExplorarClient({ cat, productos, zonas, tipos, videoUrl,
   const [zona, setZona] = useState<string | null>(null);
   const [tipo, setTipo] = useState<string | null>(null);
   const [sort, setSort] = useState<Sort>("recomendados");
-  const [activeIdx, setActiveIdx] = useState<number | null>(null);
-  const [isHovering, setIsHovering] = useState(false);
+  const [activeIdx, setActiveIdx] = useState(0);
+  const [phase, setPhase] = useState<Phase>("entering");
 
   // Top-rated restaurants for the Gastronomía cinematic hero
   const gastroCards = useMemo(() =>
@@ -33,25 +34,30 @@ export default function ExplorarClient({ cat, productos, zonas, tipos, videoUrl,
       : [],
     [productos, cat.slug]
   );
-  const activeCard = activeIdx !== null ? (gastroCards[activeIdx] ?? null) : null;
+  const activeCard = gastroCards[activeIdx] ?? null;
 
-  // Start auto-rotation after entry animations finish (~2.8s)
+  // Phase state machine: entering → cards → expanding → fullscreen → next card entering…
   useEffect(() => {
     if (cat.slug !== "gastronomia" || gastroCards.length === 0) return;
+    const durations: Record<Phase, number> = {
+      entering: 900,
+      cards: 2200,
+      expanding: 650,
+      fullscreen: 2800,
+    };
     const t = setTimeout(() => {
-      setActiveIdx(prev => prev === null ? 0 : prev);
-    }, 2800);
+      switch (phase) {
+        case "entering":   setPhase("cards"); break;
+        case "cards":      setPhase("expanding"); break;
+        case "expanding":  setPhase("fullscreen"); break;
+        case "fullscreen":
+          setActiveIdx(i => (i + 1) % gastroCards.length);
+          setPhase("entering");
+          break;
+      }
+    }, durations[phase]);
     return () => clearTimeout(t);
-  }, [cat.slug, gastroCards.length]);
-
-  // Advance to next card every 4s (pauses while hovering a card)
-  useEffect(() => {
-    if (activeIdx === null || isHovering || gastroCards.length === 0) return;
-    const t = setTimeout(() => {
-      setActiveIdx(i => i !== null ? (i + 1) % gastroCards.length : 0);
-    }, 4000);
-    return () => clearTimeout(t);
-  }, [activeIdx, isHovering, gastroCards.length]);
+  }, [phase, cat.slug, gastroCards.length]);
 
   const filtered = useMemo(() => {
     let result = [...productos];
@@ -77,18 +83,18 @@ export default function ExplorarClient({ cat, productos, zonas, tipos, videoUrl,
 
       {/* Hero — Cinematic for Gastronomía, standard for the rest */}
       {cat.slug === "gastronomia" ? (
-        <section className="gastro-cinema">
-          {/* Base video — fades once auto-rotation starts */}
+        <section className={`gastro-cinema${phase === "fullscreen" ? " phase-fullscreen" : ""}`}>
+          {/* Base video / gradient background — always visible */}
           {videoUrl ? (
             <video
-              className={`gastro-cinema-bg${activeIdx !== null ? " faded" : ""}`}
+              className="gastro-cinema-bg"
               autoPlay muted loop playsInline preload="auto"
             >
               <source src={videoUrl} type="video/mp4" />
             </video>
           ) : (
             <div
-              className={`gastro-cinema-bg${activeIdx !== null ? " faded" : ""}`}
+              className="gastro-cinema-bg"
               style={{ background: gradiente ?? "linear-gradient(135deg,#6E2C00,#D68910)" }}
             />
           )}
@@ -106,68 +112,46 @@ export default function ExplorarClient({ cat, productos, zonas, tipos, videoUrl,
 
           <div className="gastro-cinema-shade" />
 
-          {/* Left text panel */}
+          {/* Left text panel — always shows active card detail */}
           <div className="gastro-cinema-left">
             <a href="/" className="xpl-back">← Yupii</a>
             <div className="gastro-text-wrap">
-
-              {/* Intro text — visible before auto-rotation starts */}
-              <div className={`gastro-text-default${activeIdx !== null ? " hidden" : ""}`}>
-                <p className="gastro-cinema-tag">Gastronomía · República Dominicana</p>
-                <h1 className="gastro-cinema-title">
-                  Donde el sabor<br />se convierte<br />en recuerdo
-                </h1>
-                <p className="gastro-cinema-desc">
-                  {productos.length} experiencias gastronómicas únicas en la RD.
-                </p>
-                <a href="#tipo-selector" className="gastro-cinema-cta">
-                  Descubrir experiencias ↓
-                </a>
-              </div>
-
-              {/* Active card detail — re-animates on each card change via key */}
-              <div className={`gastro-text-detail${activeIdx !== null ? " visible" : ""}`}>
-                {activeCard && (
-                  <div key={activeIdx} className="gastro-detail-inner">
-                    <p className="gastro-detail-loc">— {activeCard.lugar}</p>
-                    <h2 className="gastro-detail-name">{activeCard.titulo}</h2>
-                    <p className="gastro-detail-desc">{activeCard.descripcion}</p>
-                    <div className="gastro-detail-row">
-                      <span className="gastro-detail-stars">★ {activeCard.rating.toFixed(1)}</span>
-                      <span className="gastro-detail-price">{rd(activeCard.precio)}</span>
-                    </div>
-                    <a href={`/experiencia/${activeCard.slug}`} className="gastro-cinema-cta gastro-cta-detail">
-                      Reservar experiencia →
-                    </a>
+              {activeCard && (
+                <div key={activeIdx} className="gastro-detail-inner">
+                  <p className="gastro-detail-loc">— {activeCard.lugar}</p>
+                  <h2 className="gastro-detail-name">{activeCard.titulo}</h2>
+                  <p className="gastro-detail-desc">{activeCard.descripcion}</p>
+                  <div className="gastro-detail-row">
+                    <span className="gastro-detail-stars">★ {activeCard.rating.toFixed(1)}</span>
+                    <span className="gastro-detail-price">{rd(activeCard.precio)}</span>
                   </div>
-                )}
-              </div>
-
-              {/* Progress dots */}
-              {activeIdx !== null && (
-                <div className="gastro-dots">
-                  {gastroCards.map((_, i) => (
-                    <button
-                      key={i}
-                      className={`gastro-dot${activeIdx === i ? " on" : ""}`}
-                      onClick={() => { setActiveIdx(i); setIsHovering(false); }}
-                      aria-label={`Ver experiencia ${i + 1}`}
-                    />
-                  ))}
+                  <a href={`/experiencia/${activeCard.slug}`} className="gastro-cinema-cta gastro-cta-detail">
+                    Reservar experiencia →
+                  </a>
                 </div>
               )}
+
+              {/* Progress dots */}
+              <div className="gastro-dots">
+                {gastroCards.map((_, i) => (
+                  <button
+                    key={i}
+                    className={`gastro-dot${activeIdx === i ? " on" : ""}`}
+                    onClick={() => { setActiveIdx(i); setPhase("cards"); }}
+                    aria-label={`Ver experiencia ${i + 1}`}
+                  />
+                ))}
+              </div>
             </div>
           </div>
 
-          {/* Portrait cards row */}
-          <div className="gastro-cinema-cards">
+          {/* Portrait cards row — slides in/out based on phase */}
+          <div className={`gastro-cinema-cards${phase === "expanding" || phase === "fullscreen" ? " offscreen" : ""}${phase === "entering" ? " entering" : ""}`}>
             {gastroCards.map((p, i) => (
               <a
                 key={p.id}
                 href={`/experiencia/${p.slug}`}
-                className={`gastro-card${activeIdx === i ? " active" : ""}${activeIdx !== null && activeIdx !== i ? " dimmed" : ""}`}
-                onMouseEnter={() => { setIsHovering(true); setActiveIdx(i); }}
-                onMouseLeave={() => setIsHovering(false)}
+                className={`gastro-card${activeIdx === i && phase === "cards" ? " active" : ""}`}
               >
                 <img src={p.imagen} alt={p.titulo} loading="eager" />
                 <div className="gastro-card-overlay" />

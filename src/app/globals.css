@@ -2275,8 +2275,6 @@ video.cat-section-video-bg {
   z-index: 0;
   transition: opacity 0.55s ease;
 }
-.gastro-cinema-bg.faded { opacity: 0; }
-
 /* ── Per-card background images (crossfade) ── */
 .gastro-bg-swap {
   position: absolute;
@@ -2286,7 +2284,8 @@ video.cat-section-video-bg {
   object-fit: cover;
   z-index: 0;
   opacity: 0;
-  transition: opacity 0.55s ease;
+  transform: scale(1);
+  transition: opacity 0.55s ease, transform 0.3s ease;
 }
 .gastro-bg-swap.active { opacity: 1; }
 
@@ -2332,16 +2331,6 @@ video.cat-section-video-bg {
 .gastro-text-wrap {
   position: relative;
   min-height: 300px;
-}
-
-/* ── Default text (category intro) ────── */
-.gastro-text-default {
-  transition: opacity 0.35s ease, transform 0.35s ease;
-}
-.gastro-text-default.hidden {
-  opacity: 0;
-  transform: translateY(-14px);
-  pointer-events: none;
 }
 
 .gastro-cinema-tag {
@@ -2397,19 +2386,6 @@ video.cat-section-video-bg {
   animation: none;
   opacity: 1;
   margin-top: 28px;
-}
-
-/* ── Detail text (hovered card info) ──── */
-.gastro-text-detail {
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  opacity: 0;
-  transition: opacity 0.38s ease;
-  pointer-events: none;
-}
-.gastro-text-detail.visible {
-  opacity: 1;
-  pointer-events: auto;
 }
 
 /* Inner wrapper — re-animates via key on each card change */
@@ -2496,6 +2472,8 @@ video.cat-section-video-bg {
   gap: 14px;
   align-items: flex-end;
   overflow: visible;
+  transition: transform 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+              opacity 0.65s ease;
 }
 
 .gastro-card {
@@ -2507,10 +2485,7 @@ video.cat-section-video-bg {
   flex-shrink: 0;
   text-decoration: none;
   cursor: pointer;
-  /* Initial appearance via keyframe, then managed by .active/.dimmed */
-  opacity: 0;
-  animation: gastro-card-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-  /* Hover interactions */
+  opacity: 1;
   transition:
     width 0.45s cubic-bezier(0.22, 1, 0.36, 1),
     height 0.45s cubic-bezier(0.22, 1, 0.36, 1),
@@ -2520,25 +2495,12 @@ video.cat-section-video-bg {
   box-shadow: 0 8px 28px rgba(0,0,0,0.4);
 }
 
-/* Staggered entry */
-.gastro-card:nth-child(1) { animation-delay: 0.55s; }
-.gastro-card:nth-child(2) { animation-delay: 0.95s; }
-.gastro-card:nth-child(3) { animation-delay: 1.35s; }
-.gastro-card:nth-child(4) { animation-delay: 1.75s; }
-.gastro-card:nth-child(5) { animation-delay: 2.15s; }
-
 /* Active card — expands and lifts */
 .gastro-card.active {
-  width: 260px;
-  height: 310px;
+  width: 225px;
+  height: 315px;
   box-shadow: 0 28px 64px rgba(0,0,0,0.65);
-  transform: translateY(-10px);
-}
-
-/* Non-active sibling cards — dim and sink */
-.gastro-card.dimmed {
-  opacity: 0.55;
-  transform: translateY(8px) scale(0.96);
+  transform: translateY(-12px);
 }
 
 /* Full-bleed photo inside card */
@@ -2608,6 +2570,33 @@ video.cat-section-video-bg {
   color: rgba(255,255,255,0.7);
 }
 
+/* ── Card strip phase animations ──────── */
+
+/* Card strip slides in from right (entering phase) */
+.gastro-cinema-cards.entering {
+  animation: gastro-cards-enter 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+/* Card strip slides out to right (expanding/fullscreen phase) */
+.gastro-cinema-cards.offscreen {
+  transform: translateX(calc(100% + 80px));
+  opacity: 0;
+  transition: transform 0.65s cubic-bezier(0.55, 0, 1, 0.45),
+              opacity 0.65s ease;
+}
+@keyframes gastro-cards-enter {
+  from { transform: translateX(calc(100% + 80px)); opacity: 0; }
+  to   { transform: translateX(0); opacity: 1; }
+}
+
+/* Subtle zoom-out during fullscreen phase for drama */
+.phase-fullscreen .gastro-bg-swap.active {
+  animation: gastro-bg-breathe 3s ease forwards;
+}
+@keyframes gastro-bg-breathe {
+  from { transform: scale(1.05); }
+  to   { transform: scale(1); }
+}
+
 /* ── Scroll hint ──────────────────────── */
 .gastro-cinema-scroll {
   position: absolute;
@@ -2634,7 +2623,7 @@ video.cat-section-video-bg {
   .gastro-cinema-left { left: 32px; width: 320px; bottom: 70px; }
   .gastro-cinema-cards { left: 36%; gap: 10px; }
   .gastro-card { width: 160px; height: 255px; }
-  .gastro-card.active { width: 220px; height: 275px; }
+  .gastro-card.active { width: 200px; height: 275px; }
 }
 @media (max-width: 700px) {
   .gastro-cinema { height: 100svh; min-height: 580px; }
@@ -2653,7 +2642,7 @@ video.cat-section-video-bg {
   }
   .gastro-cinema-cards::-webkit-scrollbar { display: none; }
   .gastro-card { width: 145px; height: 210px; flex-shrink: 0; }
-  .gastro-card.active { width: 190px; height: 225px; }
+  .gastro-card.active { width: 175px; height: 225px; }
   .gastro-cinema-scroll { left: 20px; }
 }
 
