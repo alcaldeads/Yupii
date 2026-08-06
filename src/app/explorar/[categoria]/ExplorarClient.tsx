@@ -40,6 +40,11 @@ export default function ExplorarClient({ cat, productos, zonas, tipos, videoUrl,
   const [expander, setExpander] = useState<ExpanderState | null>(null);
   const [queue, setQueue] = useState<number[]>([0, 1, 2, 3, 4]);
 
+  // featuredIdx: what the HEADER shows (background image + left text + dots)
+  // Only changes when a card STARTS expanding (double-rAF) — never during preview
+  // This ensures header and card expansion are always in perfect sync
+  const [featuredIdx, setFeaturedIdx] = useState(0);
+
   // Ref mirrors queue state so setTimeout callbacks never see stale values
   const queueRef = useRef<number[]>([0, 1, 2, 3, 4]);
 
@@ -62,10 +67,7 @@ export default function ExplorarClient({ cat, productos, zonas, tipos, videoUrl,
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cat.slug, gastroCards.length]);
 
-  // The card currently featured (in expander while expanding/fullscreen, else queue front)
-  // Use queue STATE (not ref) so header is always in sync with React's render cycle
-  const currentCardIdx = expander !== null ? expander.cardIdx : (queue[0] ?? 0);
-  const activeCard = gastroCards[currentCardIdx] ?? null;
+  const activeCard = gastroCards[featuredIdx] ?? null;
 
   // ── Phase machine ─────────────────────────────────────────────────────────
   // preview  → 1600ms: queue[0] is active (bigger). After timer:
@@ -127,11 +129,13 @@ export default function ExplorarClient({ cat, productos, zonas, tipos, videoUrl,
   }, [phase, cat.slug, gastroCards.length]);
 
   // Trigger expander expansion on next paint (FLIP technique)
+  // setFeaturedIdx here so header (bg + text) changes IN SYNC with the expansion animation
   useEffect(() => {
     if (!expander || expander.expanded) return;
     const r1 = requestAnimationFrame(() => {
       const r2 = requestAnimationFrame(() => {
         setExpander(e => e ? { ...e, expanded: true } : null);
+        setFeaturedIdx(expander.cardIdx); // ← same frame as expansion starts
       });
       return () => cancelAnimationFrame(r2);
     });
@@ -158,12 +162,13 @@ export default function ExplorarClient({ cat, productos, zonas, tipos, videoUrl,
   const precioDesde = Math.min(...productos.map((p) => p.precio));
   const avgRating = productos.reduce((s, p) => s + p.rating, 0) / productos.length;
 
-  // Jump to a specific card (user click / dot)
+  // Jump to a specific card (user click / dot) — immediately update header too
   const jumpToCard = (cardIdx: number) => {
     const newQueue = [cardIdx, ...queueRef.current.filter(i => i !== cardIdx)];
     queueRef.current = newQueue;
     setQueue([...newQueue]);
     setExpander(null);
+    setFeaturedIdx(cardIdx);
     setPhase("preview");
   };
 
@@ -184,7 +189,7 @@ export default function ExplorarClient({ cat, productos, zonas, tipos, videoUrl,
           {/* Per-card background crossfade */}
           {gastroCards.map((p, i) => (
             <img key={p.id} src={p.imagen} alt="" aria-hidden="true"
-              className={`gastro-bg-swap${currentCardIdx === i ? " active" : ""}`} />
+              className={`gastro-bg-swap${featuredIdx === i ? " active" : ""}`} />
           ))}
 
           <div className="gastro-cinema-shade" />
@@ -211,7 +216,7 @@ export default function ExplorarClient({ cat, productos, zonas, tipos, videoUrl,
             <a href="/" className="xpl-back">← Yupii</a>
             <div className="gastro-text-wrap">
               {activeCard && (
-                <div key={currentCardIdx} className="gastro-detail-inner">
+                <div key={featuredIdx} className="gastro-detail-inner">
                   <p className="gastro-detail-loc">— {activeCard.lugar}</p>
                   <h2 className="gastro-detail-name">{activeCard.titulo}</h2>
                   <p className="gastro-detail-desc">{activeCard.descripcion}</p>
@@ -227,7 +232,7 @@ export default function ExplorarClient({ cat, productos, zonas, tipos, videoUrl,
               <div className="gastro-dots">
                 {gastroCards.map((_, i) => (
                   <button key={i}
-                    className={`gastro-dot${currentCardIdx === i ? " on" : ""}`}
+                    className={`gastro-dot${featuredIdx === i ? " on" : ""}`}
                     onClick={() => jumpToCard(i)}
                     aria-label={`Ver experiencia ${i + 1}`}
                   />
