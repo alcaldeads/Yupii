@@ -63,7 +63,8 @@ export default function ExplorarClient({ cat, productos, zonas, tipos, videoUrl,
   }, [cat.slug, gastroCards.length]);
 
   // The card currently featured (in expander while expanding/fullscreen, else queue front)
-  const currentCardIdx = expander !== null ? expander.cardIdx : (queueRef.current[0] ?? 0);
+  // Use queue STATE (not ref) so header is always in sync with React's render cycle
+  const currentCardIdx = expander !== null ? expander.cardIdx : (queue[0] ?? 0);
   const activeCard = gastroCards[currentCardIdx] ?? null;
 
   // ── Phase machine ─────────────────────────────────────────────────────────
